@@ -197,4 +197,6 @@ const useGameState = () => {
   return { state, moveDown, moveLeft, moveUp, moveRight, onResize }
 }
 
+export { TILE_ANIMATION_DELAY, TOTAL_COLS }
+
 export default useGameState
