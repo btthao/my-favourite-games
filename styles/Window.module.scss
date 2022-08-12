@@ -1,0 +1,65 @@
+$primary-color: #f0eee3;
+$secondary-color: #E9CEEE;
+$border-color: #2d2d2d;
+.container {
+    padding: 20px;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.window {
+    background: $primary-color;
+    border: 2px solid $border-color;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.title-bar {
+    width: 100%;
+    height: 38px;
+    background: $secondary-color;
+    border-bottom: 2px solid $border-color;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 3%;
+    font-weight: 700;
+    font-size: 18px;
+    >div {
+        display: flex;
+    }
+    button {
+        border-color: $border-color;
+        background: none;
+        width: 25px;
+        height: 25px;
+        margin-left: 3px;
+        text-align: center;
+        padding: 0;
+        display: grid;
+        place-items: center;
+        cursor: pointer;
+        &:active{
+            transform: scale(0.98)
+        }
+    }
+    .minimize-btn {
+        font-size: 20px;
+        padding-top: 6px;
+    }
+    .maximize-btn {
+        font-size: 17px;
+    }
+    .close-btn {
+        font-size: 21px;
+    }
+}
+
+.inner {
+    flex:1;
+    width: 100%;
+}
