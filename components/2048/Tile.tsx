@@ -1,13 +1,13 @@
 import { TileState } from '../../utils/2048'
 import styles from '../../styles/2048/Tile.module.scss'
 import { TILE_ANIMATION_DELAY } from '../../hooks/use2048State'
+import { TILE_GAP } from '../../constants'
 
 interface TileProps extends TileState {
   width: number
   height: number
 }
 
-const TILE_GAP = 1
 
 const Tile: React.FC<TileProps> = ({
   value,

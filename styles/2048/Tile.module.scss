@@ -33,10 +33,10 @@
 }
 
 .tile[data-value='8'] {
-  background: #58addb;
+  background: #7fb0ca;
 }
 .tile[data-value='16'] {
-  background: #57b5d0;
+  background: #4aabc6;
 }
 .tile[data-value='32'] {
   background: #63b994;
@@ -46,23 +46,25 @@
 }
 
 .tile[data-value='128'] {
-  background: #91a26b;
+  background: #a4bd6e;
 }
 
 .tile[data-value='256'] {
-  background: #bbb879;
+  background: #e6be6e;
 }
 
 .tile[data-value='512'] {
-  background: #e1a58c;
+  background: #df9a7c;
 }
 
 .tile[data-value='1024'] {
-  background: #faaeb8;
+  background: #dd8692;
+  font-size: calc(var(--font-size)*0.9);
 }
 
 .tile[data-value='2048'] {
-  background: #dd7a87;
+  background: #dd4e61;
+  font-size: calc(var(--font-size)*0.9);
 }
 
 @keyframes pop {

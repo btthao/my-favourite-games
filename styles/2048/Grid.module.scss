@@ -6,8 +6,8 @@
 }
 .grid {
   position: relative;
-  border: 1px solid white;
-  background: white;
+  border: 2px solid #000000;
+  background: #000000;
   display: grid;
 }
 
@@ -20,9 +20,9 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   grid-template-rows: repeat(4, 1fr);
-  gap: 1px;
+  gap: 2px;
   div {
-    background: #333333;
+    background: #d6d4d4;
   }
 }
 
