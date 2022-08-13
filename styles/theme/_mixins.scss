@@ -1,0 +1,13 @@
+@mixin tile-2048-color($color) {
+  background: $color;
+  border-left-color: lighten($color, 3%);
+  border-top-color: lighten($color, 3%);
+  border-right-color: darken($color, 3%);
+  border-bottom-color: darken($color, 3%);
+}
+
+@mixin center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
