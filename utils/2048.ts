@@ -29,6 +29,11 @@ export const getAllTilesPos = (row: number, col: number) => {
   return tiles
 }
 
+export const TOTAL_ROWS = 4
+export const TOTAL_COLS = 4
+export const TILE_ANIMATION_DELAY = 70
+export const ALL_TILES_POS = getAllTilesPos(TOTAL_ROWS, TOTAL_COLS)
+
 export const getRandomEmptyTile = (tiles: TilePos[]) => {
   return tiles[Math.floor(Math.random() * tiles.length)]
 }
@@ -87,4 +92,44 @@ export const makeTilesBoard = (
   })
 
   return board
+}
+
+export const isGameOver = (activeTiles: ActiveTilesState) => {
+  let board = makeTilesBoard(TOTAL_ROWS, TOTAL_COLS, activeTiles)
+  for (let r = 0; r < TOTAL_ROWS; r++) {
+    for (let c = 0; c < TOTAL_COLS; c++) {
+      if (!board[r][c]) return false
+      let value = board[r][c].value
+      if (c > 0 && board[r][c - 1]?.value == value) return false
+      if (c < TOTAL_COLS - 1 && board[r][c + 1]?.value == value) return false
+      if (r > 0 && board[r - 1][c]?.value == value) return false
+      if (r < TOTAL_ROWS - 1 && board[r + 1][c]?.value == value) return false
+    }
+  }
+
+  return true
+}
+
+export const updateGameState = ({
+  tilesMoved,
+  activeTiles,
+}: {
+  tilesMoved: boolean
+  activeTiles: ActiveTilesState
+}) => {
+  if (tilesMoved) {
+    const emptyTiles = getEmptyTiles(activeTiles, ALL_TILES_POS)
+    if (emptyTiles.length) {
+      activeTiles = [
+        ...activeTiles,
+        {
+          isNew: true,
+          value: 2,
+          position: getRandomEmptyTile(emptyTiles),
+        },
+      ]
+    }
+  }
+
+  return { activeTiles, gameOver: isGameOver(activeTiles) }
 }

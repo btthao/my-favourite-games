@@ -1,11 +1,13 @@
 import {
   ActiveTilesState,
-  getEmptyTiles,
-  getRandomEmptyTile,
+  ALL_TILES_POS,
   getStartingActiveTiles,
   makeTilesBoard,
   TileState,
-  getAllTilesPos,
+  TILE_ANIMATION_DELAY,
+  TOTAL_COLS,
+  TOTAL_ROWS,
+  updateGameState,
 } from '../utils/2048'
 import { useCallback, useReducer } from 'react'
 
@@ -14,10 +16,6 @@ const ACTION_TYPE_MOVE_LEFT = 'move-left'
 const ACTION_TYPE_MOVE_RIGHT = 'move-right'
 const ACTION_TYPE_MOVE_UP = 'move-up'
 const ACTION_TYPE_RESIZE_EVENT = 'resize'
-const TOTAL_ROWS = 4
-const TOTAL_COLS = 4
-const TILE_ANIMATION_DELAY = 70
-const ALL_TILES_POS = getAllTilesPos(TOTAL_ROWS, TOTAL_COLS)
 
 interface GameState {
   activeTiles: ActiveTilesState
@@ -45,6 +43,7 @@ function reduce(
       if (!activeTiles.length) return state
 
       let tilesMoved = false
+      let score = state.score
       let newActiveTiles: ActiveTilesState = []
 
       //   put active tiles in a board
@@ -91,13 +90,17 @@ function reduce(
               toBeRemoved: true,
             }
 
+            const mergedValue = tilesInCol[i].value * 2
+
             // add a merged Tile
             tilesInCol.push({
-              value: tilesInCol[i].value * 2,
+              value: mergedValue,
               isMerged: true,
               position,
               animationDelay: mergedTileAnimationDelay,
             })
+            score += mergedValue
+
             i--
           } else {
             if (!tilesMoved) {
@@ -118,21 +121,16 @@ function reduce(
         newActiveTiles = [...newActiveTiles, ...tilesInCol]
       }
 
-      //   if there's movement then add a new tile
-      if (tilesMoved) {
-        const emptyTiles = getEmptyTiles(newActiveTiles, ALL_TILES_POS)
-        if (emptyTiles.length) {
-          newActiveTiles.push({
-            isNew: true,
-            value: 2,
-            position: getRandomEmptyTile(emptyTiles),
-          })
-        }
-      }
+      const { activeTiles: updatedActiveTiles, gameOver } = updateGameState({
+        tilesMoved,
+        activeTiles: newActiveTiles,
+      })
 
       return {
         ...state,
-        activeTiles: newActiveTiles,
+        activeTiles: updatedActiveTiles,
+        gameOver,
+        score,
       }
     }
 
@@ -141,6 +139,7 @@ function reduce(
       if (!activeTiles.length) return state
 
       let tilesMoved = false
+      let score = state.score
       let newActiveTiles: ActiveTilesState = []
 
       //   put active tiles in a board
@@ -187,13 +186,17 @@ function reduce(
               toBeRemoved: true,
             }
 
+            const mergedValue = tilesInCol[i].value * 2
+
             // add a merged Tile
             tilesInCol.push({
-              value: tilesInCol[i].value * 2,
+              value: mergedValue,
               isMerged: true,
               position,
               animationDelay: mergedTileAnimationDelay,
             })
+            score += mergedValue
+
             i--
           } else {
             if (!tilesMoved) {
@@ -214,21 +217,16 @@ function reduce(
         newActiveTiles = [...newActiveTiles, ...tilesInCol]
       }
 
-      //   if there's movement then add a new tile
-      if (tilesMoved) {
-        const emptyTiles = getEmptyTiles(newActiveTiles, ALL_TILES_POS)
-        if (emptyTiles.length) {
-          newActiveTiles.push({
-            isNew: true,
-            value: 2,
-            position: getRandomEmptyTile(emptyTiles),
-          })
-        }
-      }
+      const { activeTiles: updatedActiveTiles, gameOver } = updateGameState({
+        tilesMoved,
+        activeTiles: newActiveTiles,
+      })
 
       return {
         ...state,
-        activeTiles: newActiveTiles,
+        activeTiles: updatedActiveTiles,
+        gameOver,
+        score,
       }
     }
 
@@ -237,6 +235,7 @@ function reduce(
       if (!activeTiles.length) return state
 
       let tilesMoved = false
+      let score = state.score
       let newActiveTiles: ActiveTilesState = []
 
       //   put active tiles in a board
@@ -282,14 +281,17 @@ function reduce(
               position,
               toBeRemoved: true,
             }
+            const mergedValue = tilesInRow[i].value * 2
 
             // add a merged Tile
             tilesInRow.push({
-              value: tilesInRow[i].value * 2,
+              value: mergedValue,
               isMerged: true,
               position,
               animationDelay: mergedTileAnimationDelay,
             })
+            score += mergedValue
+
             i--
           } else {
             if (!tilesMoved) {
@@ -310,21 +312,16 @@ function reduce(
         newActiveTiles = [...newActiveTiles, ...tilesInRow]
       }
 
-      //   if there's movement then add a new tile
-      if (tilesMoved) {
-        const emptyTiles = getEmptyTiles(newActiveTiles, ALL_TILES_POS)
-        if (emptyTiles.length) {
-          newActiveTiles.push({
-            isNew: true,
-            value: 2,
-            position: getRandomEmptyTile(emptyTiles),
-          })
-        }
-      }
+      const { activeTiles: updatedActiveTiles, gameOver } = updateGameState({
+        tilesMoved,
+        activeTiles: newActiveTiles,
+      })
 
       return {
         ...state,
-        activeTiles: newActiveTiles,
+        activeTiles: updatedActiveTiles,
+        gameOver,
+        score,
       }
     }
     case ACTION_TYPE_MOVE_LEFT: {
@@ -332,6 +329,7 @@ function reduce(
       if (!activeTiles.length) return state
 
       let tilesMoved = false
+      let score = state.score
       let newActiveTiles: ActiveTilesState = []
 
       //   put active tiles in a board
@@ -378,13 +376,17 @@ function reduce(
               toBeRemoved: true,
             }
 
+            const mergedValue = tilesInRow[i].value * 2
+
             // add a merged Tile
             tilesInRow.push({
-              value: tilesInRow[i].value * 2,
+              value: mergedValue,
               isMerged: true,
               position,
               animationDelay: mergedTileAnimationDelay,
             })
+            score += mergedValue
+
             i--
           } else {
             if (!tilesMoved) {
@@ -405,21 +407,16 @@ function reduce(
         newActiveTiles = [...newActiveTiles, ...tilesInRow]
       }
 
-      //   if there's movement then add a new tile
-      if (tilesMoved) {
-        const emptyTiles = getEmptyTiles(newActiveTiles, ALL_TILES_POS)
-        if (emptyTiles.length) {
-          newActiveTiles.push({
-            isNew: true,
-            value: 2,
-            position: getRandomEmptyTile(emptyTiles),
-          })
-        }
-      }
+      const { activeTiles: updatedActiveTiles, gameOver } = updateGameState({
+        tilesMoved,
+        activeTiles: newActiveTiles,
+      })
 
       return {
         ...state,
-        activeTiles: newActiveTiles,
+        activeTiles: updatedActiveTiles,
+        gameOver,
+        score,
       }
     }
 
