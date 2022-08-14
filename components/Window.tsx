@@ -2,9 +2,7 @@ import styles from '../styles/Window.module.scss'
 import { useResizeDetector } from 'react-resize-detector'
 import { ASPECT_RATIO, MAX_HEIGHT, MAX_WIDTH } from '../constants'
 import { calculateRenderSize } from '../utils/calculateSize'
-import { BiSquare } from 'react-icons/bi'
-import { GrFormClose } from 'react-icons/gr'
-import { AiOutlineMinus } from 'react-icons/ai'
+import { FiMinusSquare, FiPlusSquare, FiXSquare } from 'react-icons/fi'
 
 interface WindowProps {
   component: React.ComponentType<any>
@@ -28,6 +26,7 @@ const Window: React.FC<WindowProps> = ({ component: Component, title }) => {
         style={{
           width: renderWidth,
           height: renderHeight,
+          fontSize: Math.floor(renderWidth / 30),
         }}
       >
         <div className={styles['title-bar']}>
@@ -37,16 +36,16 @@ const Window: React.FC<WindowProps> = ({ component: Component, title }) => {
               className={styles['minimize-btn']}
               aria-label="Minimize window"
             >
-              <AiOutlineMinus />
+              <FiMinusSquare />
             </button>
             <button
               className={styles['maximize-btn']}
               aria-label="Maximize window"
             >
-              <BiSquare />
+              <FiPlusSquare />
             </button>
             <button className={styles['close-btn']} aria-label="Close window">
-              <GrFormClose />
+              <FiXSquare />
             </button>
           </div>
         </div>

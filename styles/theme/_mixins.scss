@@ -1,3 +1,5 @@
+@use 'variables' as *;
+
 @mixin tile-2048-color($color) {
   background: $color;
   border-left-color: lighten($color, 3%);
@@ -10,4 +12,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+@mixin title-bar {
+    background : $secondary-color;
+    padding: 0.4em 0;
+    width: 100%;
+    border-bottom: 2px solid $border-color;
+    font-weight: 700;
 }
