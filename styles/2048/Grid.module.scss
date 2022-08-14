@@ -1,14 +1,38 @@
 .container {
     width: 100%;
     height: 100%;
-    display: grid;
-    place-items: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
 }
 .grid {
   position: relative;
-  border: 2px solid #000000;
-  background: #000000;
+  border: 2px solid v.$primary-color;
+  background: v.$primary-color;
   display: grid;
+}
+
+.panel {
+    @include m.center;
+    width: 100%;
+    gap: 10%;
+    margin-top: 4%;
+    margin-bottom: 4%;
+    >div {
+        @include m.center;
+        flex-direction: column;
+        gap: 0.5em;
+        font-weight: 700;
+        padding: 0 5%;
+        color: v.$dark;
+        font-size: 1.4em;
+        >div:first-of-type {
+            font-weight: 600;
+            font-size: 0.8em;
+            color: v.$darkgray;
+        }
+    }
 }
 
 .cells {
@@ -22,7 +46,7 @@
   grid-template-rows: repeat(4, 1fr);
   gap: 2px;
   div {
-    background: #d6d4d4;
+    background: v.$gray;
   }
 }
 

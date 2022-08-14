@@ -12,7 +12,7 @@ interface GridProps {
 }
 
 const calculateTileSize = (dimension: number) => {
-  return (dimension - TILE_GAP*(TOTAL_COLS + 1)) / TOTAL_COLS
+  return (dimension - TILE_GAP * (TOTAL_COLS + 1)) / TOTAL_COLS
 }
 
 const Grid: React.FC<GridProps> = ({ width, height }) => {
@@ -20,13 +20,13 @@ const Grid: React.FC<GridProps> = ({ width, height }) => {
     width,
     height,
     aspectRatio: 1,
-    maxW: height * 0.8,
-    maxH: height * 0.8,
+    maxW: height * 0.75,
+    maxH: height * 0.75,
   })
 
   const { state, moveDown, moveUp, moveLeft, moveRight, onResize } =
     useGameState()
-  const { activeTiles } = state
+  const { activeTiles, gameOver, score, bestScore } = state
 
   useEffect(() => {
     const handleKeyDown = (event: any) => {
@@ -65,6 +65,16 @@ const Grid: React.FC<GridProps> = ({ width, height }) => {
 
   return (
     <div className={styles.container}>
+      <div className={styles.panel}>
+        <div>
+          <div>Score</div>
+          <div>{score}</div>
+        </div>
+        <div>
+          <div>Best</div>
+          <div>{bestScore}</div>
+        </div>
+      </div>
       <div
         className={styles.grid}
         style={{ width: renderWidth, height: renderHeight }}
