@@ -25,7 +25,7 @@ const Grid: React.FC<GridProps> = ({ width, height }) => {
     maxH: height * 0.75,
   })
 
-  const { state, moveDown, moveUp, moveLeft, moveRight, onResize } =
+  const { state, moveDown, moveUp, moveLeft, moveRight, onResize, newGame } =
     useGameState()
   const { activeTiles, gameOver, score, bestScore } = state
 
@@ -96,7 +96,7 @@ const Grid: React.FC<GridProps> = ({ width, height }) => {
           ))}
         </div>
       </div>
-      {gameOver && <GameOverModal />}
+      {gameOver && <GameOverModal onClick={newGame} />}
     </div>
   )
 }

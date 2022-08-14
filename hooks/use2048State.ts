@@ -16,6 +16,7 @@ const ACTION_TYPE_MOVE_LEFT = 'move-left'
 const ACTION_TYPE_MOVE_RIGHT = 'move-right'
 const ACTION_TYPE_MOVE_UP = 'move-up'
 const ACTION_TYPE_RESIZE_EVENT = 'resize'
+const ACTION_TYPE_NEW_GAME = 'new-game'
 
 interface GameState {
   activeTiles: ActiveTilesState
@@ -442,6 +443,10 @@ function reduce(
       }
     }
 
+    case ACTION_TYPE_NEW_GAME: {
+      return DEFAULT_STATE
+    }
+
     default: {
       return state
     }
@@ -478,7 +483,11 @@ const useGameState = () => {
     dispatch({ type: ACTION_TYPE_RESIZE_EVENT })
   }, [])
 
-  return { state, moveDown, moveLeft, moveUp, moveRight, onResize }
+  const newGame = useCallback(() => {
+    dispatch({ type: ACTION_TYPE_NEW_GAME })
+  }, [])
+
+  return { state, moveDown, moveLeft, moveUp, moveRight, onResize, newGame }
 }
 
 export { TILE_ANIMATION_DELAY, TOTAL_COLS }
