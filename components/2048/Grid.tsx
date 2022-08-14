@@ -5,6 +5,7 @@ import { calculateRenderSize } from '../../utils/calculateSize'
 import Tile from './Tile'
 import { v4 as uuidv4 } from 'uuid'
 import { TILE_GAP } from '../../constants'
+import GameOverModal from '../GameOverModal'
 
 interface GridProps {
   width: number
@@ -32,7 +33,7 @@ const Grid: React.FC<GridProps> = ({ width, height }) => {
     const handleKeyDown = (event: any) => {
       const { ctrlKey, key, metaKey } = event
 
-      if (ctrlKey || metaKey) {
+      if (ctrlKey || metaKey || gameOver) {
         return
       }
 
@@ -61,7 +62,7 @@ const Grid: React.FC<GridProps> = ({ width, height }) => {
       window.removeEventListener('keydown', handleKeyDown)
       window.removeEventListener('resize', onResize)
     }
-  }, [moveDown, moveLeft, moveRight, moveUp, onResize])
+  }, [moveDown, moveLeft, moveRight, moveUp, onResize, gameOver])
 
   return (
     <div className={styles.container}>
@@ -95,6 +96,7 @@ const Grid: React.FC<GridProps> = ({ width, height }) => {
           ))}
         </div>
       </div>
+      {gameOver && <GameOverModal />}
     </div>
   )
 }

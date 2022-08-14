@@ -1,0 +1,38 @@
+.container {
+    @include m.center;
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: v.$primary-color;
+    width: 60%;
+    text-align: center;
+    border: 2px solid v.$border-color;
+    flex-direction: column;
+    gap: 2em;
+    padding-bottom: 2em;
+    opacity: 0;
+    animation: pop-in 50ms forwards ease-in;
+    animation-delay: 2000ms;
+}
+
+.text {
+    @include m.title-bar;
+    @include m.center;
+}
+
+.button {
+    border: 2px solid v.$dark;
+    padding: 0.3em 0.6em;
+    background: v.$primary-color;
+    font-size: 1.2em;
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
