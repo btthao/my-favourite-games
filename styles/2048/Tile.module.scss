@@ -1,10 +1,13 @@
+@use "sass:math";
 .tile {
   font-weight: 600;
   position: absolute;
   display: grid;
   place-items: center;
   color: rgb(224, 224, 224);
-  font-size: var(--font-size);
+  font-size: 2.2em;
+//   border-width: 7px;
+//   border-style: solid;
 }
 
 .new {
@@ -24,47 +27,18 @@
   animation-duration: var(--duration);
 }
 
-.tile[data-value='2'] {
-  background: #b0b6e3;
-}
+$tile-colors:#b0b6e3, #aa94c6, #7fb0ca, #4aabc6, #63b994, #079ea5, #a4bd6e, #e6be6e, #df9a7c, #dd8692,  #dd4e61;
 
-.tile[data-value='4'] {
-  background: #aa94c6;
-}
 
-.tile[data-value='8'] {
-  background: #7fb0ca;
-}
-.tile[data-value='16'] {
-  background: #4aabc6;
-}
-.tile[data-value='32'] {
-  background: #63b994;
-}
-.tile[data-value='64'] {
-  background: #079ea5;
-}
-
-.tile[data-value='128'] {
-  background: #a4bd6e;
-}
-
-.tile[data-value='256'] {
-  background: #e6be6e;
-}
-
-.tile[data-value='512'] {
-  background: #df9a7c;
-}
-
-.tile[data-value='1024'] {
-  background: #dd8692;
-  font-size: calc(var(--font-size)*0.9);
-}
-
-.tile[data-value='2048'] {
-  background: #dd4e61;
-  font-size: calc(var(--font-size)*0.9);
+@for $i from 1 through length($tile-colors) {
+  $color: nth($tile-colors, $i);
+  $value: math.pow(2, $i);
+  .tile[data-value="#{$value}"] {
+    @include m.tile-2048-color($color);
+    @if $value > 1000 {
+        font-size: 1.9em;
+    }
+  }
 }
 
 @keyframes pop {

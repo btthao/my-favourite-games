@@ -23,7 +23,6 @@ const Tile: React.FC<TileProps> = ({
   let style: any = {
     width,
     height,
-    '--font-size': Math.floor(width / 2.5) + 'px',
   }
 
   if (isNew) {
