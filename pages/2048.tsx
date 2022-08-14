@@ -1,8 +1,8 @@
 import type { NextPage } from 'next'
 import dynamic from 'next/dynamic'
-import Grid from '../components/2048/Grid'
+import Grid from 'components/2048/Grid'
 
-const Window = dynamic(() => import('../components/Window'), {
+const Window = dynamic(() => import('components/Window'), {
   ssr: false,
 })
 

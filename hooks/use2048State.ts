@@ -8,7 +8,7 @@ import {
   TOTAL_COLS,
   TOTAL_ROWS,
   updateGameState,
-} from '../utils/2048'
+} from 'utils/2048'
 import { useCallback, useReducer } from 'react'
 
 const ACTION_TYPE_MOVE_DOWN = 'move-down'

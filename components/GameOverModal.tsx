@@ -1,4 +1,4 @@
-import styles from '../styles/GameOverModal.module.scss'
+import styles from 'styles/GameOverModal.module.scss'
 
 interface GameOverModalProps {}
 

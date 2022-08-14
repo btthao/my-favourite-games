@@ -1,11 +1,11 @@
 import { useEffect } from 'react'
-import useGameState, { TOTAL_COLS } from '../../hooks/use2048State'
-import styles from '../../styles/2048/Grid.module.scss'
-import { calculateRenderSize } from '../../utils/calculateSize'
+import useGameState, { TOTAL_COLS } from 'hooks/use2048State'
+import styles from 'styles/2048/Grid.module.scss'
+import { calculateRenderSize } from 'utils/calculateSize'
 import Tile from './Tile'
 import { v4 as uuidv4 } from 'uuid'
 import { TILE_GAP } from '../../constants'
-import GameOverModal from '../GameOverModal'
+import GameOverModal from 'components/GameOverModal'
 
 interface GridProps {
   width: number

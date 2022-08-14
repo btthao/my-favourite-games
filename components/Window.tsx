@@ -1,7 +1,7 @@
-import styles from '../styles/Window.module.scss'
+import styles from 'styles/Window.module.scss'
 import { useResizeDetector } from 'react-resize-detector'
 import { ASPECT_RATIO, MAX_HEIGHT, MAX_WIDTH } from '../constants'
-import { calculateRenderSize } from '../utils/calculateSize'
+import { calculateRenderSize } from 'utils/calculateSize'
 import { FiMinusSquare, FiPlusSquare, FiXSquare } from 'react-icons/fi'
 
 interface WindowProps {
