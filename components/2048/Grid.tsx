@@ -1,11 +1,16 @@
 import { useEffect } from 'react'
-import useGameState, { TOTAL_COLS } from 'hooks/use2048State'
+import useGameState, {
+  DEFAULT_STATE,
+  GameState,
+  TOTAL_COLS,
+} from 'hooks/use2048State'
 import styles from 'styles/2048/Grid.module.scss'
 import { calculateRenderSize } from 'utils/calculateSize'
 import Tile from './Tile'
 import { v4 as uuidv4 } from 'uuid'
 import { TILE_GAP } from '../../constants'
 import GameOverModal from 'components/GameOverModal'
+import useLocalStorage from 'hooks/useLocalStorage'
 
 interface GridProps {
   width: number
@@ -17,6 +22,10 @@ const calculateTileSize = (dimension: number) => {
 }
 
 const Grid: React.FC<GridProps> = ({ width, height }) => {
+  const [gameState, setGameState] = useLocalStorage<GameState>(
+    '2048',
+    DEFAULT_STATE
+  )
   const { renderHeight, renderWidth } = calculateRenderSize({
     width,
     height,
@@ -26,7 +35,7 @@ const Grid: React.FC<GridProps> = ({ width, height }) => {
   })
 
   const { state, moveDown, moveUp, moveLeft, moveRight, onResize, newGame } =
-    useGameState()
+    useGameState(gameState)
   const { activeTiles, gameOver, score, bestScore } = state
 
   useEffect(() => {
@@ -63,6 +72,10 @@ const Grid: React.FC<GridProps> = ({ width, height }) => {
       window.removeEventListener('resize', onResize)
     }
   }, [moveDown, moveLeft, moveRight, moveUp, onResize, gameOver])
+
+  useEffect(() => {
+    setGameState(state)
+  }, [activeTiles, gameOver, score, bestScore, state, setGameState])
 
   return (
     <div className={styles.container}>
