@@ -19,14 +19,14 @@ const ACTION_TYPE_MOVE_UP = 'move-up'
 const ACTION_TYPE_RESIZE_EVENT = 'resize'
 const ACTION_TYPE_NEW_GAME = 'new-game'
 
-interface GameState {
+export interface GameState {
   activeTiles: ActiveTilesState
   score: number
   bestScore: number
   gameOver: boolean
 }
 
-const DEFAULT_STATE: GameState = {
+export const DEFAULT_STATE: GameState = {
   activeTiles: [],
   score: 0,
   bestScore: 0,
@@ -382,21 +382,9 @@ function reduce(
       const { activeTiles } = state
       if (!activeTiles.length) return state
 
-      let newActiveTiles = []
-      for (const tile of activeTiles) {
-        if (tile.toBeRemoved) continue
-        newActiveTiles.push({
-          ...tile,
-          isNew: false,
-          isMerged: false,
-          prevPosition: null,
-          animationDelay: null,
-        })
-      }
-
       return {
         ...state,
-        activeTiles: newActiveTiles,
+        activeTiles: filterActiveTiles(activeTiles, false),
       }
     }
 
@@ -410,13 +398,23 @@ function reduce(
   }
 }
 
-const useGameState = () => {
+const useGameState = (initialState: GameState) => {
   const [state, dispatch] = useReducer(reduce, null, () => {
-    const activeTiles = getStartingActiveTiles(ALL_TILES_POS)
-    //   get local storage for best score or current score
-    return {
-      ...DEFAULT_STATE,
-      activeTiles,
+    const { activeTiles, gameOver, score } = initialState
+    if (activeTiles?.length) {
+      return {
+        ...initialState,
+        activeTiles: gameOver
+          ? getStartingActiveTiles(ALL_TILES_POS)
+          : filterActiveTiles(initialState.activeTiles, true),
+        score: gameOver ? 0 : score,
+        gameOver: false,
+      }
+    } else {
+      return {
+        ...DEFAULT_STATE,
+        activeTiles: getStartingActiveTiles(ALL_TILES_POS),
+      }
     }
   })
 

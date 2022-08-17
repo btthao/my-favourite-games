@@ -168,3 +168,24 @@ export const mergeTiles = ({
 
   return tiles
 }
+
+// only show active tiles during resize event => prevent transition
+// if from previous game in localstorage => show pop in animation for all tiles
+export const filterActiveTiles = (
+  activeTiles: ActiveTilesState,
+  fromPreviousGame: boolean
+) => {
+  let newActiveTiles = []
+  for (const tile of activeTiles) {
+    if (tile.toBeRemoved) continue
+    newActiveTiles.push({
+      ...tile,
+      isNew: fromPreviousGame,
+      isMerged: false,
+      prevPosition: null,
+      animationDelay: null,
+    })
+  }
+
+  return newActiveTiles
+}
