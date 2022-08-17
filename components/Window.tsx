@@ -1,22 +1,30 @@
 import styles from 'styles/Window.module.scss'
 import { useResizeDetector } from 'react-resize-detector'
-import { ASPECT_RATIO, MAX_HEIGHT, MAX_WIDTH } from '../constants'
 import { calculateRenderSize } from 'utils/calculateSize'
 import { FiMinusSquare, FiPlusSquare, FiXSquare } from 'react-icons/fi'
 
 interface WindowProps {
   component: React.ComponentType<any>
   title: string
+  aspectRatio: number
+  max_width: number
+  max_height: number
 }
 
-const Window: React.FC<WindowProps> = ({ component: Component, title }) => {
+const Window: React.FC<WindowProps> = ({
+  component: Component,
+  title,
+  aspectRatio,
+  max_height,
+  max_width,
+}) => {
   const { width, height, ref } = useResizeDetector()
   const { renderHeight, renderWidth } = calculateRenderSize({
     width,
     height,
-    aspectRatio: ASPECT_RATIO,
-    maxW: MAX_WIDTH,
-    maxH: MAX_HEIGHT,
+    aspectRatio: aspectRatio,
+    maxW: max_width,
+    maxH: max_height,
   })
 
   return (

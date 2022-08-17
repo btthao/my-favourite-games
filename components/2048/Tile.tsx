@@ -1,7 +1,7 @@
 import { TileState } from 'utils/2048'
 import styles from 'styles/2048/Tile.module.scss'
 import { TILE_ANIMATION_DELAY } from 'hooks/use2048State'
-import { TILE_GAP } from '../../constants'
+import { TILE_GAP_2048 } from '../../constants'
 
 interface TileProps extends TileState {
   width: number
@@ -36,10 +36,14 @@ const Tile: React.FC<TileProps> = ({
   if (prevPosition) {
     style = {
       ...style,
-      left: `${prevPosition.c * (TILE_GAP + width)}px`,
-      top: `${prevPosition.r * (TILE_GAP + height)}px`,
-      '--move-x': `${(position.c - prevPosition.c) * (TILE_GAP + width)}px`,
-      '--move-y': `${(position.r - prevPosition.r) * (TILE_GAP + height)}px`,
+      left: `${prevPosition.c * (TILE_GAP_2048 + width)}px`,
+      top: `${prevPosition.r * (TILE_GAP_2048 + height)}px`,
+      '--move-x': `${
+        (position.c - prevPosition.c) * (TILE_GAP_2048 + width)
+      }px`,
+      '--move-y': `${
+        (position.r - prevPosition.r) * (TILE_GAP_2048 + height)
+      }px`,
       '--duration': `${
         Math.max(
           Math.abs(position.r - prevPosition.r),
@@ -51,8 +55,8 @@ const Tile: React.FC<TileProps> = ({
   } else {
     style = {
       ...style,
-      left: `${position.c * (TILE_GAP + width)}px`,
-      top: `${position.r * (TILE_GAP + height)}px`,
+      left: `${position.c * (TILE_GAP_2048 + width)}px`,
+      top: `${position.r * (TILE_GAP_2048 + height)}px`,
     }
   }
 

@@ -8,7 +8,7 @@ import styles from 'styles/2048/Grid.module.scss'
 import { calculateRenderSize } from 'utils/calculateSize'
 import Tile from './Tile'
 import { v4 as uuidv4 } from 'uuid'
-import { TILE_GAP } from '../../constants'
+import { TILE_GAP_2048 } from '../../constants'
 import GameOverModal from 'components/GameOverModal'
 import useLocalStorage from 'hooks/useLocalStorage'
 import { BsFillEmojiSmileFill, BsFillEmojiFrownFill } from 'react-icons/bs'
@@ -19,7 +19,7 @@ interface GridProps {
 }
 
 const calculateTileSize = (dimension: number) => {
-  return (dimension - TILE_GAP * (TOTAL_COLS + 1)) / TOTAL_COLS
+  return (dimension - TILE_GAP_2048 * (TOTAL_COLS + 1)) / TOTAL_COLS
 }
 
 const Grid: React.FC<GridProps> = ({ width, height }) => {
@@ -31,8 +31,8 @@ const Grid: React.FC<GridProps> = ({ width, height }) => {
     width,
     height,
     aspectRatio: 1,
-    maxW: height * 0.75,
-    maxH: height * 0.75,
+    maxW: width - TILE_GAP_2048 * 2,
+    maxH: width - TILE_GAP_2048 * 2,
   })
 
   const { state, moveDown, moveUp, moveLeft, moveRight, onResize, newGame } =
