@@ -11,6 +11,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { TILE_GAP } from '../../constants'
 import GameOverModal from 'components/GameOverModal'
 import useLocalStorage from 'hooks/useLocalStorage'
+import { BsFillEmojiSmileFill, BsFillEmojiFrownFill } from 'react-icons/bs'
 
 interface GridProps {
   width: number
@@ -84,7 +85,14 @@ const Grid: React.FC<GridProps> = ({ width, height }) => {
           <div>Score</div>
           <div>{score}</div>
         </div>
-        <div>
+        <div
+          role="button"
+          aria-label="restart"
+          className={styles.restart}
+          onClick={newGame}
+        >
+          {gameOver ? <BsFillEmojiFrownFill /> : <BsFillEmojiSmileFill />}
+        </div>
           <div>Best</div>
           <div>{bestScore}</div>
         </div>

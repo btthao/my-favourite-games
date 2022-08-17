@@ -122,6 +122,7 @@ function reduce(
         activeTiles: updatedActiveTiles,
         gameOver,
         score,
+        bestScore: Math.max(score, state.bestScore),
       }
     }
 
@@ -206,6 +207,7 @@ function reduce(
         activeTiles: updatedActiveTiles,
         gameOver,
         score,
+        bestScore: Math.max(score, state.bestScore),
       }
     }
 
@@ -291,8 +293,10 @@ function reduce(
         activeTiles: updatedActiveTiles,
         gameOver,
         score,
+        bestScore: Math.max(score, state.bestScore),
       }
     }
+    
     case ACTION_TYPE_MOVE_LEFT: {
       const { activeTiles } = state
       if (!activeTiles.length) return state
@@ -375,6 +379,7 @@ function reduce(
         activeTiles: updatedActiveTiles,
         gameOver,
         score,
+        bestScore: Math.max(score, state.bestScore),
       }
     }
 
@@ -389,7 +394,11 @@ function reduce(
     }
 
     case ACTION_TYPE_NEW_GAME: {
-      return DEFAULT_STATE
+      return {
+        ...DEFAULT_STATE,
+        activeTiles: getStartingActiveTiles(ALL_TILES_POS),
+        bestScore: state.bestScore,
+      }
     }
 
     default: {
