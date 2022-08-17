@@ -1,15 +1,16 @@
-import {
-  ActiveTilesState,
-  ALL_TILES_POS,
-  getStartingActiveTiles,
-  makeTilesBoard,
-  TileState,
-  TILE_ANIMATION_DELAY,
-  TOTAL_COLS,
-  TOTAL_ROWS,
-  updateGameState,
-} from 'utils/2048'
 import { useCallback, useReducer } from 'react'
+import {
+    ActiveTilesState,
+    ALL_TILES_POS,
+    getStartingActiveTiles,
+    makeTilesBoard,
+    mergeTiles, TileState,
+    TILE_ANIMATION_DELAY,
+    TOTAL_COLS,
+    TOTAL_ROWS,
+    updateGameState,
+    filterActiveTiles
+} from 'utils/2048'
 
 const ACTION_TYPE_MOVE_DOWN = 'move-down'
 const ACTION_TYPE_MOVE_LEFT = 'move-left'
@@ -77,29 +78,18 @@ function reduce(
               Math.abs(tilesInCol[i - 1].position.r - currentRow) *
               TILE_ANIMATION_DELAY
 
-            tilesInCol[i - 1] = {
-              ...tilesInCol[i - 1],
-              prevPosition: { ...tilesInCol[i - 1].position },
-              position,
-              toBeRemoved: true,
-            }
-
-            tilesInCol[i] = {
-              ...tilesInCol[i],
-              prevPosition: { ...tilesInCol[i].position },
-              position,
-              toBeRemoved: true,
-            }
-
             const mergedValue = tilesInCol[i].value * 2
 
-            // add a merged Tile
-            tilesInCol.push({
-              value: mergedValue,
-              isMerged: true,
-              position,
-              animationDelay: mergedTileAnimationDelay,
-            })
+            tilesInCol = [
+              ...mergeTiles({
+                tiles: tilesInCol,
+                position,
+                idx: i,
+                mergedValue,
+                animationDelay: mergedTileAnimationDelay,
+              }),
+            ]
+
             score += mergedValue
 
             i--
@@ -173,29 +163,17 @@ function reduce(
               Math.abs(tilesInCol[i - 1].position.r - currentRow) *
               TILE_ANIMATION_DELAY
 
-            tilesInCol[i - 1] = {
-              ...tilesInCol[i - 1],
-              prevPosition: { ...tilesInCol[i - 1].position },
-              position,
-              toBeRemoved: true,
-            }
-
-            tilesInCol[i] = {
-              ...tilesInCol[i],
-              prevPosition: { ...tilesInCol[i].position },
-              position,
-              toBeRemoved: true,
-            }
-
             const mergedValue = tilesInCol[i].value * 2
 
-            // add a merged Tile
-            tilesInCol.push({
-              value: mergedValue,
-              isMerged: true,
-              position,
-              animationDelay: mergedTileAnimationDelay,
-            })
+            tilesInCol = [
+              ...mergeTiles({
+                tiles: tilesInCol,
+                position,
+                idx: i,
+                mergedValue,
+                animationDelay: mergedTileAnimationDelay,
+              }),
+            ]
             score += mergedValue
 
             i--
@@ -269,28 +247,18 @@ function reduce(
               Math.abs(tilesInRow[i - 1].position.c - currentCol) *
               TILE_ANIMATION_DELAY
 
-            tilesInRow[i - 1] = {
-              ...tilesInRow[i - 1],
-              prevPosition: { ...tilesInRow[i - 1].position },
-              position,
-              toBeRemoved: true,
-            }
-
-            tilesInRow[i] = {
-              ...tilesInRow[i],
-              prevPosition: { ...tilesInRow[i].position },
-              position,
-              toBeRemoved: true,
-            }
             const mergedValue = tilesInRow[i].value * 2
 
-            // add a merged Tile
-            tilesInRow.push({
-              value: mergedValue,
-              isMerged: true,
-              position,
-              animationDelay: mergedTileAnimationDelay,
-            })
+            tilesInRow = [
+              ...mergeTiles({
+                tiles: tilesInRow,
+                position,
+                idx: i,
+                mergedValue,
+                animationDelay: mergedTileAnimationDelay,
+              }),
+            ]
+
             score += mergedValue
 
             i--
@@ -363,29 +331,18 @@ function reduce(
               Math.abs(tilesInRow[i - 1].position.c - currentCol) *
               TILE_ANIMATION_DELAY
 
-            tilesInRow[i - 1] = {
-              ...tilesInRow[i - 1],
-              prevPosition: { ...tilesInRow[i - 1].position },
-              position,
-              toBeRemoved: true,
-            }
-
-            tilesInRow[i] = {
-              ...tilesInRow[i],
-              prevPosition: { ...tilesInRow[i].position },
-              position,
-              toBeRemoved: true,
-            }
-
             const mergedValue = tilesInRow[i].value * 2
 
-            // add a merged Tile
-            tilesInRow.push({
-              value: mergedValue,
-              isMerged: true,
-              position,
-              animationDelay: mergedTileAnimationDelay,
-            })
+            tilesInRow = [
+              ...mergeTiles({
+                tiles: tilesInRow,
+                position,
+                idx: i,
+                mergedValue,
+                animationDelay: mergedTileAnimationDelay,
+              }),
+            ]
+
             score += mergedValue
 
             i--

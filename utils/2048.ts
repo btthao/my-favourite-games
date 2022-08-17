@@ -133,3 +133,38 @@ export const updateGameState = ({
 
   return { activeTiles, gameOver: isGameOver(activeTiles) }
 }
+
+export const mergeTiles = ({
+  tiles,
+  position,
+  idx,
+  mergedValue,
+  animationDelay,
+}: {
+  tiles: TileState[]
+  position: TilePos
+  idx: number
+  mergedValue: number
+  animationDelay: number
+}) => {
+  tiles = produce(tiles, (draft) => {
+    let count = 0
+    while (++count <= 2) {
+      draft[idx] = {
+        ...draft[idx],
+        prevPosition: { ...draft[idx].position },
+        position,
+        toBeRemoved: true,
+      }
+      idx--
+    }
+    draft.push({
+      value: mergedValue,
+      isMerged: true,
+      position,
+      animationDelay,
+    })
+  })
+
+  return tiles
+}
