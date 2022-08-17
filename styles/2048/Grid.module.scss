@@ -8,31 +8,37 @@
 }
 .grid {
   position: relative;
-  border: 2px solid v.$primary-color;
-  background: v.$primary-color;
+  border: 2px solid v.$dark;
+  background: v.$dark;
   display: grid;
+  overflow: hidden;
 }
 
 .panel {
-    @include m.center;
+    @include m.flex-center;
     width: 100%;
-    gap: 10%;
-    margin-top: 4%;
-    margin-bottom: 4%;
-    >div {
-        @include m.center;
+    flex: 1;
+    background: v.$dark;
+    justify-content: space-between;
+    position: relative;
+    .score {
+        @include m.flex-center;
         flex-direction: column;
-        gap: 0.5em;
+        gap: 0.2em;
         font-weight: 700;
-        padding: 0 5%;
-        color: v.$dark;
+        padding: 0 1em;
+        color: v.$white;
         font-size: 1.4em;
         >div:first-of-type {
             font-weight: 600;
             font-size: 0.8em;
-            color: v.$darkgray;
+            color: v.$gray;
         }
+    }
+}
+
 .restart {
+    @include m.position-center;
     svg {
         color: v.$yellow;
         font-size: 2.7em;

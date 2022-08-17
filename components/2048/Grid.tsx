@@ -31,8 +31,8 @@ const Grid: React.FC<GridProps> = ({ width, height }) => {
     width,
     height,
     aspectRatio: 1,
-    maxW: width - TILE_GAP_2048 * 2,
-    maxH: width - TILE_GAP_2048 * 2,
+    maxW: width - 10,
+    maxH: width - 10,
   })
 
   const { state, moveDown, moveUp, moveLeft, moveRight, onResize, newGame } =
@@ -81,7 +81,7 @@ const Grid: React.FC<GridProps> = ({ width, height }) => {
   return (
     <div className={styles.container}>
       <div className={styles.panel}>
-        <div>
+        <div className={styles.score}>
           <div>Score</div>
           <div>{score}</div>
         </div>
@@ -93,6 +93,7 @@ const Grid: React.FC<GridProps> = ({ width, height }) => {
         >
           {gameOver ? <BsFillEmojiFrownFill /> : <BsFillEmojiSmileFill />}
         </div>
+        <div className={styles.score}>
           <div>Best</div>
           <div>{bestScore}</div>
         </div>

@@ -1,16 +1,13 @@
 .container {
-    @include m.center;
-    position: absolute;
-    top: 45%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: v.$primary-color;
-    width: 60%;
+    @include m.position-center;
+    @include m.flex-center;
+    background: v.$gray;
+    width: 70%;
     text-align: center;
-    border: 2px solid v.$border-color;
+    border: 2px solid v.$dark;
     flex-direction: column;
-    gap: 2em;
-    padding-bottom: 2em;
+    gap: 2.2em;
+    padding-bottom: 2.2em;
     opacity: 0;
     animation: pop-in 50ms forwards ease-in;
     animation-delay: 1000ms;
@@ -18,14 +15,17 @@
 
 .text {
     @include m.title-bar;
-    @include m.center;
+    @include m.flex-center;
+    background: v.$dark;
+    color: v.$white;
 }
 
 .button {
     border: 2px solid v.$dark;
-    padding: 0.3em 0.6em;
-    background: v.$primary-color;
-    font-size: 1.2em;
+    padding: 0.4em 0.8em;
+    font-size: 1.5em;
+    font-weight: 600;
+    background: v.$green; 
 }
 
 @keyframes pop-in {

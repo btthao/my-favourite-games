@@ -1,5 +1,5 @@
 .container {
-    padding: 20px;
+    padding: 10vh;
     width: 100vw;
     height: 100vh;
     display: flex;
@@ -8,11 +8,12 @@
 }
 
 .window {
-    background: v.$primary-color;
-    border: 2px solid v.$border-color;
+    @include m.gradient;
+    padding: 5px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    z-index: 100;
 }
 
 .title-bar {

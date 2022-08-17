@@ -4,10 +4,8 @@
   position: absolute;
   display: grid;
   place-items: center;
-  color: rgb(224, 224, 224);
-  font-size: 2.2em;
-//   border-width: 7px;
-//   border-style: solid;
+  font-size: 2em;
+  @include m.tile-color(v.$primary-color);
 }
 
 .new {
@@ -27,16 +25,17 @@
   animation-duration: var(--duration);
 }
 
-$tile-colors:#b0b6e3, #aa94c6, #7fb0ca, #4aabc6, #63b994, #079ea5, #a4bd6e, #e6be6e, #df9a7c, #dd8692,  #dd4e61;
-
+ $tile-colors:  #adcfe1, #609dbe, #1a7f9b, #72d4c5,  #19bdad, #0dd196,#f6dc91, #f6bb46, #faa784, #dd94d1, #E94C89;
 
 @for $i from 1 through length($tile-colors) {
   $color: nth($tile-colors, $i);
   $value: math.pow(2, $i);
   .tile[data-value="#{$value}"] {
-    @include m.tile-2048-color($color);
+    @include m.tile-color($color);
     @if $value > 1000 {
-        font-size: 1.9em;
+        font-size: 2.2em;
+    } @else {
+        font-size: 2.4em;
     }
   }
 }

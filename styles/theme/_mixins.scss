@@ -1,23 +1,38 @@
 @use 'variables' as *;
 
-@mixin tile-2048-color($color) {
-  background: $color;
-  border-left-color: lighten($color, 3%);
-  border-top-color: lighten($color, 3%);
-  border-right-color: darken($color, 3%);
-  border-bottom-color: darken($color, 3%);
+@mixin tile-color($bg) {
+  $color-brightness: round((red($bg) * 299) + (green($bg) * 587) + (blue($bg) * 114) / 1000);
+  $light-color: round((red(#ffffff) * 299) + (green(#ffffff) * 587) + (blue(#ffffff) * 114) / 1000);
+  
+  background: $bg;
+  @if abs($color-brightness) < ($light-color/2){
+    color: darken($white, 7%);
+  } @else {
+    color: lighten($dark, 5%);
+  }
 }
 
-@mixin center {
+@mixin flex-center {
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
+@mixin position-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
 @mixin title-bar {
-    background : $secondary-color;
-    padding: 0.4em 0;
+    padding: 0.55em 0;
     width: 100%;
-    border-bottom: 2px solid $border-color;
     font-weight: 700;
+    font-size: 1.1em;
+}
+
+@mixin gradient {
+    background: $green;
+    background: linear-gradient(90deg, $green 0%, $blue 25%,  $purple 50%, $pink 75%, $yellow-light 100%);
 }
