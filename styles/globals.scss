@@ -25,3 +25,9 @@ button, [role='button'] {
     color: v.$dark;
     cursor: pointer;
 }
+
+.page-wrapper {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+}
