@@ -5,7 +5,7 @@
   display: grid;
   place-items: center;
   font-size: 2em;
-  @include m.tile-color(v.$primary-color);
+  @include m.tile-color(#ff2862);
 }
 
 .new {
@@ -25,7 +25,7 @@
   animation-duration: var(--duration);
 }
 
- $tile-colors:  #adcfe1, #609dbe, #1a7f9b, #72d4c5,  #19bdad, #0dd196,#f6dc91, #f6bb46, #faa784, #dd94d1, #E94C89;
+ $tile-colors: #c4a0fa, #8a72f6, #86a4f7, #5786eb, #0194fc, #72d4c5,  #19bdad, #00D99A,#f6dc91, #f6bb46, #f75cb6;
 
 @for $i from 1 through length($tile-colors) {
   $color: nth($tile-colors, $i);
