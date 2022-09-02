@@ -1,5 +1,6 @@
 import styles from 'styles/Menu.module.scss'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 const Folder: React.FC = () => {
   return (
@@ -36,15 +37,21 @@ const games = [
 ]
 
 const Menu: React.FC = () => {
+  const router = useRouter()
   return (
     <div className={styles.menu}>
       {games.map((game) => (
-        <Link key={game.name} href={game.link}>
-          <div className={styles.folder}>
-            <Folder />
-            <p>{game.name}</p>
-          </div>
-        </Link>
+        <div
+          key={game.name}
+          className={`${router.asPath === game.link ? styles.disabled : ''}`}
+        >
+          <Link href={game.link}>
+            <div className={styles.folder}>
+              <Folder />
+              <p>{game.name}</p>
+            </div>
+          </Link>
+        </div>
       ))}
     </div>
   )
