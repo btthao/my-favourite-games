@@ -31,8 +31,8 @@ const Grid: React.FC<GridProps> = ({ width, height }) => {
     width,
     height,
     aspectRatio: 1,
-    maxW: width - 10,
-    maxH: width - 10,
+    maxW: height*0.77,
+    maxH: height*0.77,
   })
 
   const { state, moveDown, moveUp, moveLeft, moveRight, onResize, newGame } =

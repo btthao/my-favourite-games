@@ -9,7 +9,7 @@
 
 .window {
     @include m.gradient;
-    padding: 5px;
+    padding: 0 6px 6px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -21,8 +21,6 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-left: 3%;
-    padding-right: 3%;
     >div {
         display: flex;
     }

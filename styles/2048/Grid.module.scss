@@ -4,35 +4,36 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: space-evenly;
     position: relative;
+    @include m.radial-gradient;
+    padding-bottom: 1em;
 }
 .grid {
   position: relative;
-  border: 2px solid v.$dark;
+  border: 2px solid v.$pinkshadow;
   background: v.$dark;
   display: grid;
-  overflow: hidden;
 }
 
 .panel {
     @include m.flex-center;
     width: 100%;
-    flex: 1;
-    background: v.$dark;
     justify-content: space-between;
     position: relative;
+    padding: 0.5em 2em;
     .score {
         @include m.flex-center;
         flex-direction: column;
-        gap: 0.2em;
+        gap: 0.3em;
         font-weight: 700;
         padding: 0 1em;
-        color: v.$white;
-        font-size: 1.4em;
+        color: v.$hotpink;
+        font-size: 1.6em;
         >div:first-of-type {
             font-weight: 600;
             font-size: 0.8em;
-            color: v.$gray;
+            color: v.$white;
         }
     }
 }
@@ -56,7 +57,7 @@
   grid-template-rows: repeat(4, 1fr);
   gap: 2px;
   div {
-    background: v.$gray;
+    box-shadow: v.$pinkshadow 0px 0px 0px 1px;
   }
 }
 

@@ -34,7 +34,7 @@ const Window: React.FC<WindowProps> = ({
         style={{
           width: renderWidth,
           height: renderHeight,
-          fontSize: Math.floor(renderWidth / 30),
+          fontSize: Math.floor(renderWidth / 55),
         }}
       >
         <div className={styles['title-bar']}>

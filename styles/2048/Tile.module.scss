@@ -1,11 +1,13 @@
 @use "sass:math";
 .tile {
-  font-weight: 600;
+  font-weight: 700;
   position: absolute;
   display: grid;
   place-items: center;
-  font-size: 2em;
-  @include m.tile-color(#ff2862);
+  font-size: 1.6em;
+  word-break: break-all;
+  text-align: center;
+  @include m.tile-color(#2af61f);
 }
 
 .new {
@@ -16,7 +18,7 @@
 
 .merged {
   transform: scale(0);
-  animation: merge 300ms forwards ease-out;
+  animation: merge 200ms forwards ease-out;
   animation-delay: var(--animation-delay);
 }
 
@@ -25,15 +27,17 @@
   animation-duration: var(--duration);
 }
 
- $tile-colors: #c4a0fa, #8a72f6, #86a4f7, #5786eb, #0194fc, #72d4c5,  #19bdad, #00D99A,#f6dc91, #f6bb46, #f75cb6;
+ $tile-colors: #c6a5f7, #ab6ef9, #a739f5, #7794dd, #3c69ca, #165ffc, #70b3a9,  #1ddcc9, #29d18b,#d2df6e, #f6f622, #da6d1b,  #f97ec5, #fc1e9f, #f35b63, #f91f4e;
 
 @for $i from 1 through length($tile-colors) {
   $color: nth($tile-colors, $i);
   $value: math.pow(2, $i);
   .tile[data-value="#{$value}"] {
     @include m.tile-color($color);
-    @if $value > 1000 {
-        font-size: 2.2em;
+    @if $value > 10000 {
+        font-size: 1.6em;
+    } @else if $value > 1000 {
+        font-size: 2em;
     } @else {
         font-size: 2.4em;
     }
@@ -54,7 +58,7 @@
     transform: scale(0.6);
   }
   30% {
-    transform: scale(1.1);
+    transform: scale(1.07);
   }
   100% {
     transform: scale(1);

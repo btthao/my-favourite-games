@@ -2,30 +2,26 @@
     @include m.position-center;
     @include m.flex-center;
     background: v.$gray;
-    width: 70%;
+    width: 40%;
     text-align: center;
-    border: 2px solid v.$dark;
+    border: 3px solid v.$gray;
     flex-direction: column;
     gap: 2.2em;
     padding-bottom: 2.2em;
     opacity: 0;
     animation: pop-in 50ms forwards ease-in;
     animation-delay: 1000ms;
+    box-shadow: rgba(227, 113, 174, 0.4) 0px 3px 8px;
 }
 
 .text {
     @include m.title-bar;
     @include m.flex-center;
-    background: v.$dark;
-    color: v.$white;
+    @include m.gradient;
 }
 
 .button {
-    border: 2px solid v.$dark;
-    padding: 0.4em 0.8em;
-    font-size: 1.5em;
-    font-weight: 600;
-    background: v.$green; 
+    @include m.outset-btn;
 }
 
 @keyframes pop-in {
