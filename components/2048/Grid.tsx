@@ -11,7 +11,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { TILE_GAP_2048 } from '../../constants'
 import GameOverModal from 'components/GameOverModal'
 import useLocalStorage from 'hooks/useLocalStorage'
-import { BsFillEmojiSmileFill, BsFillEmojiFrownFill } from 'react-icons/bs'
+import StatusBar from 'components/StatusBar'
 
 interface GridProps {
   width: number
@@ -31,8 +31,8 @@ const Grid: React.FC<GridProps> = ({ width, height }) => {
     width,
     height,
     aspectRatio: 1,
-    maxW: height*0.77,
-    maxH: height*0.77,
+    maxW: height * 0.77,
+    maxH: height * 0.77,
   })
 
   const { state, moveDown, moveUp, moveLeft, moveRight, onResize, newGame } =
@@ -80,24 +80,22 @@ const Grid: React.FC<GridProps> = ({ width, height }) => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.panel}>
-        <div className={styles.score}>
-          <div>Score</div>
-          <div>{score}</div>
-        </div>
-        <div
-          role="button"
-          aria-label="restart"
-          className={styles.restart}
-          onClick={newGame}
-        >
-          {gameOver ? <BsFillEmojiFrownFill /> : <BsFillEmojiSmileFill />}
-        </div>
-        <div className={styles.score}>
-          <div>Best</div>
-          <div>{bestScore}</div>
-        </div>
-      </div>
+      <StatusBar
+        gameOver={gameOver}
+        onClick={newGame}
+        leftComponent={
+          <div className={styles.score}>
+            <div>Score</div>
+            <div>{score}</div>
+          </div>
+        }
+        rightComponent={
+          <div className={styles.score}>
+            <div>Best</div>
+            <div>{bestScore}</div>
+          </div>
+        }
+      />
       <div
         className={styles.grid}
         style={{ width: renderWidth, height: renderHeight }}
