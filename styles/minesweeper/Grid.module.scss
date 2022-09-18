@@ -1,0 +1,25 @@
+.container {
+    @include m.game-grid-container;
+    >div:first-of-type {
+        padding-top: 2em;
+        padding-bottom: 2em;
+    }
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(30,1fr);
+    grid-template-rows: repeat(16,1fr);
+    width:100%;
+    flex:1;
+}
+
+.tile {
+    background: lighten(v.$dark, 7%);
+    border: 0.18em solid lighten(v.$dark, 17%);
+    border-style: outset;
+    position: relative;
+    .inner {
+        position: absolute;
+    }
+}
