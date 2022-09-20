@@ -14,12 +14,3 @@
     flex:1;
 }
 
-.tile {
-    background: lighten(v.$dark, 7%);
-    border: 0.18em solid lighten(v.$dark, 17%);
-    border-style: outset;
-    position: relative;
-    .inner {
-        position: absolute;
-    }
-}
