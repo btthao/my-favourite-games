@@ -19,7 +19,7 @@ const Window: React.FC<WindowProps> = ({
   max_width,
 }) => {
   const { width, height, ref } = useResizeDetector()
-  const { renderHeight, renderWidth } = calculateRenderSize({
+  const { renderHeight, renderWidth, fontSize } = calculateRenderSize({
     width,
     height,
     aspectRatio: aspectRatio,
@@ -34,7 +34,7 @@ const Window: React.FC<WindowProps> = ({
         style={{
           width: renderWidth,
           height: renderHeight,
-          fontSize: Math.floor(renderWidth / 55),
+          fontSize,
         }}
       >
         <div className={styles['title-bar']}>
