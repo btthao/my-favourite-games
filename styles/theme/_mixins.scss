@@ -4,7 +4,7 @@
 @mixin tile-color($color) {
   background: $dark;
   color: $color;
-  text-shadow: 5px 5px 0px rgba(194, 104, 246, 0.15);
+  text-shadow: 0.2em 0.2em 0 rgba(194, 104, 246, 0.15);
 }
 
 
@@ -30,7 +30,7 @@
 }
 
 @mixin outset-btn {
-    border: 1.5px solid lighten($gray, 7%);
+    border: 0.1em solid lighten($gray, 7%);
     border-style: outset;
     padding: 0.4em 0.8em;
     background: transparent;

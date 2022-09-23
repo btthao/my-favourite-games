@@ -4,14 +4,14 @@
     background: v.$gray;
     width: 40%;
     text-align: center;
-    border: 3px solid v.$gray;
+    border: 0.2em solid v.$gray;
     flex-direction: column;
     gap: 2.2em;
     padding-bottom: 2.2em;
     opacity: 0;
     animation: pop-in 50ms forwards ease-in;
     animation-delay: 1000ms;
-    box-shadow: rgba(227, 113, 174, 0.4) 0px 3px 8px;
+    box-shadow: rgba(227, 113, 174, 0.4) 0em 0.2em 0.5em;
 }
 
 .text {
