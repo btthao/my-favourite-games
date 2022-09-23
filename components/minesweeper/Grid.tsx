@@ -6,7 +6,7 @@ import Tile from './Tile'
 interface GridProps {}
 
 const Grid: React.FC<GridProps> = ({}) => {
-  const { state, firstClick, newGame } = useGameState()
+  const { state, newGame, reveal, flag } = useGameState()
   const { tiles, gameOver, minesCount, timer } = state
   return (
     <div className={styles.container}>
@@ -21,8 +21,9 @@ const Grid: React.FC<GridProps> = ({}) => {
           <Tile
             key={idx}
             index={idx}
-            isNull={tile === null}
-            firstClick={firstClick}
+            reveal={reveal}
+            flag={flag}
+            gameOver={gameOver}
             {...tile}
           />
         ))}

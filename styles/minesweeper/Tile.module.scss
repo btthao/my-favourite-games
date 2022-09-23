@@ -1,18 +1,44 @@
 .tile {
-    background: lighten(v.$dark, 7%);
-    border: 0.18em solid lighten(v.$dark, 17%);
-    border-style: outset;
-    position: relative;
-    .inner {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        display: grid;
-        place-items: center;
+  background: lighten(v.$dark, 7%);
+  border: 0.18em outset lighten(v.$dark, 17%);
+  position: relative;
+  .inner {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    place-items: center;
+    font-weight: 700;
+    font-size: 1.325em;
+    svg {
+      color: lighten(v.$dark, 77%);
+      font-size: 0.9em;
     }
+    .flag, .wrong-flag {
+      color: rgb(222, 46, 46);
+    }
+    .wrong-flag {
+        position: absolute;
+        font-size: 1.9em;
+    }
+  }
 }
 
-.mine {
-    font-size: 1.15em;
-    color: v.$hotpink;
+
+$tile-colors: #c680f1, #5b6fbe, #4ecebb, #ab3bfc, #2d8bf6, #29f90e, #ed5cb1,#f91f1f;
+
+@for $i from 1 through length($tile-colors) {
+  $color: nth($tile-colors, $i);
+  .inner[data-value='#{$i}'] {
+    color: $color;
+  }
+}
+
+.revealed {
+  background: lighten(v.$dark, 3%);
+  border: 0.01em solid lighten(v.$dark, 10%);
+}
+
+.clicked-mine {
+  background: rgb(222, 46, 46);
 }

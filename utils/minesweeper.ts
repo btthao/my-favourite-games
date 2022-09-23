@@ -9,23 +9,19 @@ export interface TileState {
   surroundingMines: number
   isRevealed: boolean
   isFlagged: boolean
+  isClickedMine: boolean
 }
 
-const DEFAULT_TILE_STATE = {
+export const DEFAULT_TILE_STATE = {
   hasMine: false,
   surroundingMines: 0,
   isRevealed: false,
   isFlagged: false,
+  isClickedMine: false,
 }
 
-// initialize game
-
-export const initMinesweeper = (clickedTileIdx: number) => {
-  let tiles: TileState[] = new Array(TOTAL_COLS * TOTAL_ROWS).fill(
-    DEFAULT_TILE_STATE
-  )
-
-  //   random 99 mines excluding clicked tile
+export const initMinesweeper = (tiles: TileState[], clickedTileIdx: number) => {
+  //   random 99 mines excluding clicked tile and its surrounding tiles
   const mines = createMines(clickedTileIdx)
 
   tiles = produce(tiles, (draft) => {
@@ -36,10 +32,9 @@ export const initMinesweeper = (clickedTileIdx: number) => {
     // calculate surrounding mines
     for (let i = 0; i < draft.length; i++) {
       let surroundingMines = 0
-      const hasTop = i - TOTAL_COLS >= 0
-      const hasBottom = i + TOTAL_COLS < TOTAL_COLS * TOTAL_ROWS
-      const hasLeft = i % TOTAL_COLS > 0
-      const hasRight = i % TOTAL_COLS !== TOTAL_COLS - 1
+      const { hasTop, hasBottom, hasLeft, hasRight } =
+        checkPossibleSurroundingTiles(i)
+
       //   top
       if (hasTop && draft[i - TOTAL_COLS].hasMine) {
         surroundingMines++
@@ -77,7 +72,73 @@ export const initMinesweeper = (clickedTileIdx: number) => {
     }
   })
 
-  return tiles
+  return expandMineFreeArea(tiles, clickedTileIdx)
+}
+
+export const expandMineFreeArea = (
+  tiles: TileState[],
+  clickedTileIdx: number
+) => {
+  let tilesToBeRevealed: Set<number> | number[] = new Set()
+  let stack: number[] = [clickedTileIdx]
+
+  while (stack.length > 0) {
+    const i = stack.pop()
+
+    if (i === undefined || i === null || tilesToBeRevealed.has(i)) continue
+
+    tilesToBeRevealed.add(i)
+
+    if (tiles[i].surroundingMines > 0) continue
+
+    const { hasTop, hasBottom, hasLeft, hasRight } =
+      checkPossibleSurroundingTiles(i)
+
+    //   top
+    if (hasTop && tileCanBeRevealed(tiles[i - TOTAL_COLS])) {
+      stack.push(i - TOTAL_COLS)
+    }
+
+    //   bottom
+    if (hasBottom && tileCanBeRevealed(tiles[i + TOTAL_COLS])) {
+      stack.push(i + TOTAL_COLS)
+    }
+
+    //   left
+    if (hasLeft && tileCanBeRevealed(tiles[i - 1])) {
+      stack.push(i - 1)
+    }
+
+    //   right
+    if (hasRight && tileCanBeRevealed(tiles[i + 1])) {
+      stack.push(i + 1)
+    }
+
+    //   top left
+    if (hasTop && hasLeft && tileCanBeRevealed(tiles[i - TOTAL_COLS - 1])) {
+      stack.push(i - TOTAL_COLS - 1)
+    }
+
+    //   top right
+    if (hasTop && hasRight && tileCanBeRevealed(tiles[i - TOTAL_COLS + 1])) {
+      stack.push(i - TOTAL_COLS + 1)
+    }
+
+    //   bottom left
+    if (hasBottom && hasLeft && tileCanBeRevealed(tiles[i + TOTAL_COLS - 1])) {
+      stack.push(i + TOTAL_COLS - 1)
+    }
+    //   bottom right
+    if (hasBottom && hasRight && tileCanBeRevealed(tiles[i + TOTAL_COLS + 1])) {
+      stack.push(i + TOTAL_COLS + 1)
+    }
+  }
+
+  return produce(tiles, (draft) => {
+    for (const i of Array.from(tilesToBeRevealed)) {
+      draft[i].isRevealed = true
+    }
+  })
 }
 
 const shuffleArray = (array: any[]) => {
@@ -89,15 +150,38 @@ const shuffleArray = (array: any[]) => {
   }
 }
 
-const createMines = (clickedTileIdx: number) => {
+const createMines = (i: number) => {
   let mines = Array.from(Array(TOTAL_COLS * TOTAL_ROWS).keys())
 
-  // exclude clicked tile then shuffle
-  mines.splice(clickedTileIdx, 1)
+  // exclude clicked tile and its surrounding tiles then shuffle
+  const excludedTiles = [
+    i,
+    i - 1,
+    i + 1,
+    i - TOTAL_COLS,
+    i - TOTAL_COLS - 1,
+    i - TOTAL_COLS + 1,
+    i + TOTAL_COLS,
+    i + TOTAL_COLS - 1,
+    i + TOTAL_COLS + 1,
+  ]
+  mines = mines.filter((x) => excludedTiles.indexOf(x) < 0)
   shuffleArray(mines)
 
   // the first 99 tiles would be mines
   mines.splice(TOTAL_MINES)
 
   return mines
+}
+
+const checkPossibleSurroundingTiles = (i: number) => {
+  const hasTop = i - TOTAL_COLS >= 0
+  const hasBottom = i + TOTAL_COLS < TOTAL_COLS * TOTAL_ROWS
+  const hasLeft = i % TOTAL_COLS > 0
+  const hasRight = i % TOTAL_COLS !== TOTAL_COLS - 1
+  return { hasTop, hasBottom, hasLeft, hasRight }
+}
+
+const tileCanBeRevealed = (tile: TileState) => {
+  return !tile.hasMine && !tile.isRevealed && !tile.isFlagged
 }
