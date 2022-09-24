@@ -8,8 +8,25 @@
 
 .restart {
     @include m.position-center;
+    display: flex;
     svg {
         color: v.$yellow;
-        font-size: 2.7em;
+        font-size: 3em;
     }
+    &::after {
+        content:'';
+        position: absolute;
+        top: 2.5%;
+        left: 2.5%;
+        width: 95%;
+        height: 95%;
+        background: black;
+        border-radius: 50%;
+        z-index: -1;
+    }
+}
+
+.stat {
+    @include m.flex-center;
+    @include m.game-stat;
 }

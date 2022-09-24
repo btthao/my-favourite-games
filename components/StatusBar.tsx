@@ -16,7 +16,7 @@ const StatusBar: React.FC<StatusBarProps> = ({
 }) => {
   return (
     <div className={styles['status-bar']}>
-      {leftComponent}
+      <div className={styles.stat}>{leftComponent}</div>
       <div
         role="button"
         aria-label="restart"
@@ -25,7 +25,7 @@ const StatusBar: React.FC<StatusBarProps> = ({
       >
         {gameOver ? <BsFillEmojiFrownFill /> : <BsFillEmojiSmileFill />}
       </div>
-      {rightComponent}
+      <div className={styles.stat}>{rightComponent}</div>
     </div>
   )
 }

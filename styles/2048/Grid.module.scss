@@ -1,3 +1,4 @@
+$shadow : v.$blueshadow;
 .container {
   @include m.game-grid-container;
   padding-bottom: 1em;
@@ -5,24 +6,8 @@
 
 .grid {
   position: relative;
-  border: 2px solid v.$pinkshadow;
-  background: v.$dark;
+  border: 2px solid $shadow;
   display: grid;
-}
-
-.score {
-    @include m.flex-center;
-    flex-direction: column;
-    gap: 0.3em;
-    font-weight: 700;
-    padding: 0 1em;
-    color: v.$hotpink;
-    font-size: 1.6em;
-    >div:first-of-type {
-        font-weight: 600;
-        font-size: 0.8em;
-        color: v.$white;
-    }
 }
 
 
@@ -37,7 +22,7 @@
   grid-template-rows: repeat(4, 1fr);
   gap: 2px;
   div {
-    box-shadow: v.$pinkshadow 0px 0px 0px 1px;
+    box-shadow: $shadow 0px 0px 0px 1px;
   }
 }
 

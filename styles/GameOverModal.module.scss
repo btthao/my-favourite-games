@@ -1,27 +1,25 @@
 .container {
     @include m.position-center;
     @include m.flex-center;
-    background: v.$gray;
+    @include m.game-over-modal;
     width: 40%;
     text-align: center;
-    border: 0.2em solid v.$gray;
     flex-direction: column;
     gap: 2.2em;
     padding-bottom: 2.2em;
-    opacity: 0;
     animation: pop-in 50ms forwards ease-in;
     animation-delay: 1000ms;
-    box-shadow: rgba(227, 113, 174, 0.4) 0em 0.2em 0.5em;
+    overflow: hidden;
 }
 
 .text {
     @include m.title-bar;
     @include m.flex-center;
-    @include m.gradient;
+    padding: 0.7em 0;
 }
 
 .button {
-    @include m.outset-btn;
+    @include m.btn;
 }
 
 @keyframes pop-in {

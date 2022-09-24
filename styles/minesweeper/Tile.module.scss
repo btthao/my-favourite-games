@@ -1,6 +1,5 @@
 .tile {
-  background: lighten(v.$dark, 7%);
-  border: 0.18em outset lighten(v.$dark, 17%);
+  @include m.mine-tile-color;
   position: relative;
   .inner {
     position: absolute;
@@ -11,34 +10,21 @@
     font-weight: 700;
     font-size: 1.325em;
     svg {
-      color: lighten(v.$dark, 77%);
       font-size: 0.9em;
     }
-    .flag, .wrong-flag {
-      color: rgb(222, 46, 46);
-    }
     .wrong-flag {
-        position: absolute;
-        font-size: 1.9em;
+      position: absolute;
+      font-size: 1.9em;
     }
   }
 }
 
-
-$tile-colors: #c680f1, #5b6fbe, #4ecebb, #ab3bfc, #2d8bf6, #29f90e, #ed5cb1,#f91f1f;
+$tile-colors: #be6ef0, #7587cf, #1bc8ae, #9b17fa, #0c7cfb, #18b603, #ed5cb1,
+  #bb0e0e;
 
 @for $i from 1 through length($tile-colors) {
   $color: nth($tile-colors, $i);
   .inner[data-value='#{$i}'] {
     color: $color;
   }
-}
-
-.revealed {
-  background: lighten(v.$dark, 3%);
-  border: 0.01em solid lighten(v.$dark, 10%);
-}
-
-.clicked-mine {
-  background: rgb(222, 46, 46);
 }

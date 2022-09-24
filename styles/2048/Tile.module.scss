@@ -7,7 +7,7 @@
   font-size: 1.6em;
   word-break: break-all;
   text-align: center;
-  @include m.tile-color(#2af61f);
+  @include m.tile-color(#0aae01);
 }
 
 .new {
@@ -27,7 +27,7 @@
   animation-duration: var(--duration);
 }
 
- $tile-colors: #c6a5f7, #ab6ef9, #a739f5, #7794dd, #3c69ca, #165ffc, #70b3a9,  #1ddcc9, #29d18b,#d2df6e, #f6f622, #da6d1b,  #f97ec5, #fc1e9f, #f35b63, #f91f4e;
+ $tile-colors:#b892f1,#7b97e0, #36b4a1,#9a62e3,#3c69ca,  #e975b9, #00b7ff, #03949e, #19b05f, #d02795, #f35b63 ,#fc941d ;
 
 @for $i from 1 through length($tile-colors) {
   $color: nth($tile-colors, $i);

@@ -17,13 +17,13 @@ export const calculateRenderSize = (props: Size) => {
       // width > height
       renderHeight = Math.min(height, maxH)
       renderWidth = renderHeight * aspectRatio
-      fontSize = height / 44
     } else {
       renderWidth = Math.min(width, maxW)
       renderHeight = renderWidth / aspectRatio
-      fontSize = width / 62
     }
   }
+
+  fontSize = renderWidth / 55
 
   return { renderHeight, renderWidth, fontSize }
 }

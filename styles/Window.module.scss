@@ -8,8 +8,7 @@
 }
 
 .window {
-    @include m.gradient;
-    padding: 0 0.4em 0.4em;
+    @include m.windowbg;
     overflow: hidden;
     display: flex;
     flex-direction: column;

@@ -5,7 +5,7 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
   color: v.$dark;
-  @include m.radial-gradient;
+  @include m.background;
 }
 
 a {
@@ -18,13 +18,14 @@ a {
   border-color: v.$dark;
 }
 
-button, [role='button'] {
-    color: v.$dark;
-    cursor: pointer;
+button,
+[role='button'] {
+  color: v.$dark;
+  cursor: pointer;
 }
 
 .page-wrapper {
-    width: 100vw;
-    height: 100vh;
-    position: relative;
+  width: 100vw;
+  height: 100vh;
+  position: relative;
 }

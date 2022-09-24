@@ -84,16 +84,16 @@ const Grid: React.FC<GridProps> = ({ width, height }) => {
         gameOver={gameOver}
         onClick={newGame}
         leftComponent={
-          <div className={styles.score}>
+          <>
             <div>Score</div>
             <div>{score}</div>
-          </div>
+          </>
         }
         rightComponent={
-          <div className={styles.score}>
+          <>
             <div>Best</div>
             <div>{bestScore}</div>
-          </div>
+          </>
         }
       />
       <div

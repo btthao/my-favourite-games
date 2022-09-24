@@ -1,62 +1,208 @@
 @use 'variables' as *;
 
+$theme: '1';
+
 // 2048
 @mixin tile-color($color) {
-  background: $dark;
   color: $color;
-  text-shadow: 0.2em 0.2em 0 rgba(194, 104, 246, 0.15);
+  @if $theme == '1' {
+    background: #dde1e5;
+  } @else {
+    background: $dark;
+    text-shadow: 0.2em 0.2em 0 rgba(194, 104, 246, 0.15);
+  }
 }
 
+@mixin mine-tile-color {
+  @if $theme == '1' {
+    background: #d6e0e4d0;
+    border: 0.14em outset lighten($gray, 58%);
+    &.revealed {
+      background: lighten($gray, 15%);
+      border: 0.01em solid lighten($gray, 24%);
+    }
+
+    &.clicked-mine {
+      background: rgb(241, 108, 108);
+    }
+    .inner {
+      svg {
+        color: lighten($dark, 7%);
+      }
+      .flag,
+      .wrong-flag {
+        color: rgb(246, 96, 96);
+      }
+    }
+  } @else {
+    background: lighten($dark, 7%);
+    border: 0.13em outset lighten($dark, 17%);
+    &.revealed {
+      background: lighten($dark, 3%);
+      border: 0.01em solid lighten($dark, 10%);
+    }
+
+    &.clicked-mine {
+      background: rgb(222, 46, 46);
+    }
+    .inner {
+      svg {
+        color: lighten($dark, 77%);
+      }
+      .flag,
+      .wrong-flag {
+        color: rgb(222, 46, 46);
+      }
+    }
+  }
+}
 
 // global
 @mixin flex-center {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 @mixin position-center {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 @mixin title-bar {
-    padding: 0.42em 0 ;
-    width: 100%;
-    font-weight: 700;
-    font-size: 1.2em;
+  padding: 0.42em 0.6em;
+  width: 100%;
+  font-weight: 700;
+  font-size: 1.2em;
+  color: $dark;
+  @if $theme == '1' {
+    background: #dbe6ea;
+  } @else {
+    background: $darkpurple;
+  }
 }
 
-@mixin outset-btn {
-    border: 0.1em solid lighten($gray, 7%);
-    border-style: outset;
-    padding: 0.4em 0.8em;
-    background: transparent;
-    font-size: 1.3em;
+@mixin game-stat {
+  flex-direction: column;
+  gap: 0.3em;
+  font-weight: 700;
+  padding: 0 1em;
+  font-size: 1.6em;
+  @if $theme == '1' {
+    color: darken(#18cb7e, 10%);
+    > div:first-of-type {
+      color: $dark;
+    }
+  } @else {
+    color: $hotpink;
+    > div:first-of-type {
+      color: white;
+    }
+  }
+  > div:first-of-type {
+    font-weight: 600;
+    font-size: 0.8em;
+  }
+}
+
+@mixin btn {
+  padding: 0.52em 0.82em;
+  background: transparent;
+  font-size: 1.3em;
+  @if $theme == '1' {
+    background: #13cd7c;
+    border: 0;
+    border-radius: 0.2em;
+  } @else {
+    border: 0.1em solid $darkpurple;
+    color: white;
+  }
+}
+
+@mixin windowbg {
+  @if $theme == '1' {
+    background: rgba(238, 238, 238, 0.66);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border-radius: 0.7em;
+    filter: brightness(0.85);
+    border: 0.1em solid rgba(255, 255, 255, 0.18);
+  } @else {
+    background: $darkpurple;
+    padding: 0 0.4em 0.4em;
+  }
 }
 
 @mixin gradient {
-    background: $green;
-    background: linear-gradient(90deg, $green 0%, $blue 25%,  $purple 50%, $pink 75%, $yellow-light 100%);
+  background: linear-gradient(
+    90deg,
+    $green 0%,
+    $blue 25%,
+    $purple 50%,
+    $pink 75%,
+    $yellow-light 100%
+  );
 }
 
-@mixin radial-gradient {
+@mixin background {
+  @if $theme == '1' {
+    background-color: #68b2cb;
+    background-image: url('/bg.jpg');
+    background-position: left center;
+    background-repeat: no-repeat;
+    background-position: fixed;
+    background-size: cover;
+    #folder-back {
+      fill: #16e68c;
+    }
+    #folder-front {
+      fill: #18cb7e;
+    }
+  } @else {
     background: $dark;
-    background-image: radial-gradient(darken($primary-color, 15%) 1.8px, transparent 0);
-    background-size: 77px 77px;
+    background-image: radial-gradient(
+      darken(#7c52c6, 20%) 1.4px,
+      transparent 0
+    );
+    background-size: 66px 66px;
     background-position: -15px -15px;
+    #folder-back {
+      fill: #f73aa1;
+    }
+    #folder-front {
+      fill: #f254ab;
+    }
+  }
 }
 
 @mixin game-grid-container {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-evenly;
-    position: relative;
-    @include radial-gradient;
-    color: $white;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  position: relative;
+  color: $white;
+  @if $theme != '1' {
+    @include background;
+    .grid {
+      background: $dark;
+    }
+  }
+}
+
+@mixin game-over-modal {
+  @if $theme == '1' {
+    background: #d3d8db;
+    border: 0.1em solid rgba(145, 145, 145, 0.38);
+    border-radius: 0.4em;
+    box-shadow: 0 0.7em 1.1em 0 rgba(72, 72, 75, 0.77);
+  } @else {
+    background: $dark;
+    box-shadow: 0 0.3em 0.8em 0 rgba(72, 47, 116, 0.77);
+  }
 }

@@ -8,7 +8,7 @@ function MyApp({ Component, pageProps }: AppProps) {
     <div className="page-wrapper">
       <Menu />
       <Component {...pageProps} />
-      <TaskBar />
+      {/* <TaskBar /> */}
     </div>
   )
 }
