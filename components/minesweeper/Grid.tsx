@@ -1,3 +1,4 @@
+import Confetti from 'components/Confetti'
 import StatusBar from 'components/StatusBar'
 import useGameState from 'hooks/useMinesweeperState'
 import { useEffect } from 'react'
@@ -19,6 +20,7 @@ const Grid: React.FC<GridProps> = ({}) => {
 
   return (
     <div className={styles.container}>
+      {won && <Confetti />}
       <StatusBar
         gameOver={gameOver}
         won={won}
