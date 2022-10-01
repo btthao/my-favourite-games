@@ -8,11 +8,13 @@ import {
   TOTAL_ROWS,
   DEFAULT_TILE_STATE,
   TOTAL_MINES,
+  checkWin,
 } from 'utils/minesweeper'
 
 const ACTION_TYPE_REVEAL = 'reveal'
 const ACTION_TYPE_FLAG = 'flag'
 const ACTION_TYPE_NEW_GAME = 'new-game'
+const ACTION_TYPE_TIMER = 'timer'
 
 export interface GameState {
   tiles: TileState[]
@@ -20,6 +22,7 @@ export interface GameState {
   timer: number
   gameOver: boolean
   isInitialized: boolean
+  won: boolean
 }
 
 export const DEFAULT_STATE: GameState = {
@@ -28,6 +31,7 @@ export const DEFAULT_STATE: GameState = {
   timer: 0,
   gameOver: false,
   isInitialized: false,
+  won: false,
 }
 
 function reduce(
@@ -59,9 +63,12 @@ function reduce(
 
       let newTiles = [...tiles]
       let gameOver = false
+      let won = false
 
       if (!newTiles[tileIndex].hasMine) {
         newTiles = expandMineFreeArea(newTiles, tileIndex)
+        gameOver = checkWin(newTiles)
+        won = gameOver
       } else {
         //   click on mine, game over, reveal all mines
         gameOver = true
@@ -79,6 +86,7 @@ function reduce(
         ...state,
         tiles: newTiles,
         gameOver,
+        won,
       }
     }
 
@@ -86,7 +94,7 @@ function reduce(
       if (!payload || state.gameOver) return state
 
       const { tileIndex } = payload
-      const { tiles } = state
+      const { tiles, minesCount } = state
 
       if (tiles[tileIndex].isRevealed) return state
 
@@ -98,6 +106,17 @@ function reduce(
       return {
         ...state,
         tiles: newTiles,
+        minesCount: newTiles[tileIndex].isFlagged
+          ? minesCount - 1
+          : minesCount + 1,
+      }
+    }
+
+    case ACTION_TYPE_TIMER: {
+      if (state.gameOver) return state
+      return {
+        ...state,
+        timer: state.timer + 1,
       }
     }
 
@@ -134,7 +153,13 @@ const useGameState = () => {
     })
   }, [])
 
-  return { state, newGame, reveal, flag }
+  const setTimer = useCallback(() => {
+    dispatch({
+      type: ACTION_TYPE_TIMER,
+    })
+  }, [])
+
+  return { state, newGame, reveal, flag, setTimer }
 }
 
 export default useGameState

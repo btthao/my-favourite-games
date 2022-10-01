@@ -81,18 +81,19 @@ const Grid: React.FC<GridProps> = ({ width, height }) => {
   return (
     <div className={styles.container}>
       <StatusBar
+        won={false}
         gameOver={gameOver}
         onClick={newGame}
         leftComponent={
           <>
-            <div>Score</div>
             <div>{score}</div>
+            <div>Score</div>
           </>
         }
         rightComponent={
           <>
-            <div>Best</div>
             <div>{bestScore}</div>
+            <div>Best</div>
           </>
         }
       />

@@ -85,25 +85,25 @@ $theme: '1';
 }
 
 @mixin game-stat {
-  flex-direction: column;
-  gap: 0.3em;
+  flex-direction: column-reverse;
+  gap: 0.1em;
   font-weight: 700;
   padding: 0 1em;
-  font-size: 1.6em;
+  font-size: 1.85em;
   @if $theme == '1' {
     color: darken(#18cb7e, 10%);
-    > div:first-of-type {
+    > div:nth-of-type(2){
       color: $dark;
     }
   } @else {
     color: $hotpink;
-    > div:first-of-type {
+    > div:nth-of-type(2) {
       color: white;
     }
   }
-  > div:first-of-type {
+  > div:nth-of-type(2) {
     font-weight: 600;
-    font-size: 0.8em;
+    font-size: 0.66em;
   }
 }
 
@@ -149,7 +149,7 @@ $theme: '1';
 
 @mixin background {
   @if $theme == '1' {
-    background-color: #68b2cb;
+    background-color: #63879E;
     background-image: url('/bg.jpg');
     background-position: left center;
     background-repeat: no-repeat;

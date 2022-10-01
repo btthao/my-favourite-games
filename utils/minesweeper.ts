@@ -185,3 +185,13 @@ const checkPossibleSurroundingTiles = (i: number) => {
 const tileCanBeRevealed = (tile: TileState) => {
   return !tile.hasMine && !tile.isRevealed && !tile.isFlagged
 }
+
+export const checkWin = (tiles: TileState[]) => {
+  for (const tile of tiles) {
+    const { hasMine, isRevealed } = tile
+    if (!hasMine && !isRevealed) {
+      return false
+    }
+  }
+  return true
+}

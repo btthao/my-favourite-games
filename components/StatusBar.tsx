@@ -1,15 +1,21 @@
-import { BsFillEmojiFrownFill, BsFillEmojiSmileFill } from 'react-icons/bs'
+import {
+  BsFillEmojiFrownFill,
+  BsFillEmojiSmileFill,
+  BsFillEmojiSunglassesFill,
+} from 'react-icons/bs'
 import styles from 'styles/StatusBar.module.scss'
 
 interface StatusBarProps {
   onClick: () => void
   gameOver: boolean
+  won: boolean
   leftComponent: JSX.Element
   rightComponent: JSX.Element
 }
 
 const StatusBar: React.FC<StatusBarProps> = ({
   onClick,
+  won,
   gameOver,
   leftComponent,
   rightComponent,
@@ -23,7 +29,13 @@ const StatusBar: React.FC<StatusBarProps> = ({
         className={styles.restart}
         onClick={onClick}
       >
-        {gameOver ? <BsFillEmojiFrownFill /> : <BsFillEmojiSmileFill />}
+        {won ? (
+          <BsFillEmojiSunglassesFill />
+        ) : gameOver ? (
+          <BsFillEmojiFrownFill />
+        ) : (
+          <BsFillEmojiSmileFill />
+        )}
       </div>
       <div className={styles.stat}>{rightComponent}</div>
     </div>
