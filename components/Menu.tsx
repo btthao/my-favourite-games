@@ -38,6 +38,10 @@ const games = [
     name: 'minesweeper',
     link: '/minesweeper',
   },
+  {
+    name: 'lines 98',
+    link: '/lines98',
+  },
 ]
 
 const Menu: React.FC = () => {

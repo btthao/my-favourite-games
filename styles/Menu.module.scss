@@ -1,7 +1,9 @@
 .menu {
     position: absolute;
     top: 7%;
-    left: 3%;
+    left: 1%;
+    display: grid;
+    gap: 7px;
     .disabled {
         position: relative;
         z-index: 1;
@@ -20,14 +22,19 @@
 
 .folder {
     color: v.$white;
-    font-weight: 700;
+    font-weight: 500;
     cursor: pointer;
+    text-align:center;
+    width: 97px;
     svg {
-        font-size: 3.5em;
+        font-size: 3.1em;
     }
     p {
-        margin: 0;
-        padding-left: 0.3em;
+        margin-top: -0.4em;
+        font-size: 0.8em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     
 }

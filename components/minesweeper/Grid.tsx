@@ -25,18 +25,8 @@ const Grid: React.FC<GridProps> = ({}) => {
         gameOver={gameOver}
         won={won}
         onClick={newGame}
-        leftComponent={
-          <div>
-            {minesCount < 10 ? '00' : minesCount < 100 ? '0' : ''}
-            {minesCount}
-          </div>
-        }
-        rightComponent={
-          <div>
-            {timer < 10 ? '00' : timer < 100 ? '0' : ''}
-            {timer}
-          </div>
-        }
+        leftComponent={<div>{minesCount}</div>}
+        rightComponent={<div>{timer}</div>}
       />
       <div className={styles.grid}>
         {tiles.map((tile, idx) => (
