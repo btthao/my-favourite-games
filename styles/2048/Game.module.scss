@@ -1,7 +1,12 @@
 $shadow : v.$blueshadow;
 .container {
-  @include m.game-grid-container;
-  padding-bottom: 1em;
+   @include m.game-container;
+   height: 100%;
+}
+
+.inner{
+    flex: 1;
+    @include m.flex-center;
 }
 
 .grid {

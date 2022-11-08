@@ -1,7 +1,6 @@
-import Grid from 'components/minesweeper/Grid'
+import Game from 'components/minesweeper/Game'
 import type { NextPage } from 'next'
 import dynamic from 'next/dynamic'
-import { ASPECT_RATIO, MAX_WIDTH, MAX_HEIGHT } from '../constants'
 
 const Window = dynamic(() => import('components/Window'), {
   ssr: false,
@@ -10,11 +9,11 @@ const Window = dynamic(() => import('components/Window'), {
 const Minesweeper: NextPage = () => {
   return (
     <Window
-      aspectRatio={ASPECT_RATIO}
-      max_height={MAX_HEIGHT}
-      max_width={MAX_WIDTH}
-      component={Grid}
+      minH={480}
+      minW={700}
+      component={Game}
       title="Minesweeper"
+      disableResize
     ></Window>
   )
 }

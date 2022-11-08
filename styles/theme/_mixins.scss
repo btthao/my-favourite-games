@@ -2,6 +2,10 @@
 
 $theme: '1';
 
+// .page-wrapper[data-theme='1'] {
+//     background-color: pink;
+// }
+
 // 2048
 @mixin tile-color($color) {
   color: $color;
@@ -72,24 +76,20 @@ $theme: '1';
 }
 
 @mixin title-bar {
-  padding: 0.42em 0.6em;
   width: 100%;
   font-weight: 700;
-  font-size: 1.2em;
+  font-size: 0.95rem;
   color: $dark;
   @if $theme == '1' {
     background: #dbe6ea;
+    padding: 0.35em 0.6rem;
   } @else {
     background: $darkpurple;
+    padding: 0.35em 0;
   }
 }
 
 @mixin game-stat {
-  flex-direction: column-reverse;
-  gap: 0.1em;
-  font-weight: 700;
-  padding: 0 1em;
-  font-size: 1.85em;
   @if $theme == '1' {
     color: darken(#18cb7e, 10%);
     > div:nth-of-type(2){
@@ -101,22 +101,16 @@ $theme: '1';
       color: white;
     }
   }
-  > div:nth-of-type(2) {
-    font-weight: 600;
-    font-size: 0.66em;
-  }
 }
 
 @mixin btn {
-  padding: 0.52em 0.82em;
-  background: transparent;
-  font-size: 1.3em;
   @if $theme == '1' {
     background: #13cd7c;
     border: 0;
-    border-radius: 0.2em;
+    border-radius: 0.2rem;
   } @else {
     border: 0.1em solid $darkpurple;
+    background: transparent;
     color: white;
   }
 }
@@ -127,12 +121,12 @@ $theme: '1';
     box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
     backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
-    border-radius: 0.7em;
+    border-radius: 0.7rem;
     filter: brightness(0.85);
     border: 0.1em solid rgba(255, 255, 255, 0.18);
   } @else {
     background: $darkpurple;
-    padding: 0 0.4em 0.4em;
+    padding: 0 0.4em 0.4rem;
   }
 }
 
@@ -178,13 +172,10 @@ $theme: '1';
   }
 }
 
-@mixin game-grid-container {
-  width: 100%;
-  height: 100%;
+@mixin game-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-evenly;
   position: relative;
   color: $white;
   @if $theme != '1' {
@@ -199,7 +190,7 @@ $theme: '1';
   @if $theme == '1' {
     background: #d3d8db;
     border: 0.1em solid rgba(145, 145, 145, 0.38);
-    border-radius: 0.4em;
+    border-radius: 0.4rem;
     box-shadow: 0 0.7em 1.1em 0 rgba(72, 72, 75, 0.77);
   } @else {
     background: $dark;

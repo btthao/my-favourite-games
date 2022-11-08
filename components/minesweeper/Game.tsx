@@ -2,12 +2,10 @@ import Confetti from 'components/Confetti'
 import StatusBar from 'components/StatusBar'
 import useGameState from 'hooks/useMinesweeperState'
 import { useEffect } from 'react'
-import styles from 'styles/minesweeper/Grid.module.scss'
+import styles from 'styles/minesweeper/Game.module.scss'
 import Tile from './Tile'
 
-interface GridProps {}
-
-const Grid: React.FC<GridProps> = ({}) => {
+const Game: React.FC = () => {
   const { state, newGame, reveal, flag, setTimer } = useGameState()
   const { tiles, gameOver, minesCount, won, timer } = state
 
@@ -44,4 +42,4 @@ const Grid: React.FC<GridProps> = ({}) => {
   )
 }
 
-export default Grid
+export default Game

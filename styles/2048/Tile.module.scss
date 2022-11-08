@@ -4,7 +4,7 @@
   position: absolute;
   display: grid;
   place-items: center;
-  font-size: 1.6em;
+  font-size: 1.4rem;
   word-break: break-all;
   text-align: center;
   @include m.tile-color(#0aae01);
@@ -35,11 +35,11 @@
   .tile[data-value="#{$value}"] {
     @include m.tile-color($color);
     @if $value > 10000 {
-        font-size: 1.5em;
+        font-size: 1.5rem;
     } @else if $value > 1000 {
-        font-size: 1.9em;
+        font-size: 1.9rem;
     } @else {
-        font-size: 2.3em;
+        font-size: 2.3rem;
     }
   }
 }

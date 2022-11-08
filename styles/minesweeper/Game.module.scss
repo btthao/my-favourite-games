@@ -1,8 +1,9 @@
 .container {
-    @include m.game-grid-container;
+    @include m.game-container;
+    height:100%;
     >div:first-of-type {
-        padding-top: 2em;
-        padding-bottom: 2em;
+        padding-top: 2rem;
+        padding-bottom: 2rem;
     }
 }
 

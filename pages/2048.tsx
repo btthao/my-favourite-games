@@ -1,22 +1,13 @@
 import type { NextPage } from 'next'
 import dynamic from 'next/dynamic'
-import Grid from 'components/2048/Grid'
-import { ASPECT_RATIO, MAX_WIDTH, MAX_HEIGHT } from '../constants'
+import Game from 'components/2048/Game'
 
 const Window = dynamic(() => import('components/Window'), {
   ssr: false,
 })
 
 const Game2048: NextPage = () => {
-  return (
-    <Window
-      aspectRatio={ASPECT_RATIO}
-      max_height={MAX_HEIGHT}
-      max_width={MAX_WIDTH}
-      component={Grid}
-      title="2048"
-    ></Window>
-  )
+  return <Window minH={580} minW={520} component={Game} title="2048"></Window>
 }
 
 export default Game2048

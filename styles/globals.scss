@@ -29,3 +29,24 @@ button,
   height: 100vh;
   position: relative;
 }
+
+.react-resizable-handle {
+    opacity: 0;
+    transform: none !important;
+}
+
+.react-resizable-handle-e {
+    top: 0 !important;
+    margin-right: -15px;
+    height: 100% !important;
+}
+.react-resizable-handle-s {
+    left: 0 !important;
+    margin-bottom: -15px;
+    width: 100% !important;
+}
+
+.disable-resize .react-resizable-handle {
+    opacity: 0;
+    cursor: default;
+}

@@ -1,18 +1,9 @@
-.container {
-    padding: 3em 1em;
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
 .window {
     @include m.windowbg;
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    z-index: 100;
+    z-index: 100000;
 }
 
 .title-bar {
@@ -26,13 +17,17 @@
     button {
         border: none;
         background: none;
-        margin-left: 0.3em;
+        margin-left: 0.3rem;
         padding: 0;
         display: grid;
         place-items: center;
-        font-size: 1.5em;
+        font-size: 1.25rem;
         &:active{
             transform: scale(0.98)
+        }
+        &:disabled {
+            opacity:0.4;
+            cursor: default;
         }
     }
 }
@@ -40,4 +35,5 @@
 .inner {
     flex:1;
     width: 100%;
+    overflow: scroll;
 }

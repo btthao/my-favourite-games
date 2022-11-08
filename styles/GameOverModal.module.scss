@@ -2,11 +2,11 @@
     @include m.position-center;
     @include m.flex-center;
     @include m.game-over-modal;
-    width: 40%;
+    width: 60%;
     text-align: center;
     flex-direction: column;
-    gap: 2.2em;
-    padding-bottom: 2.2em;
+    gap: 2rem;
+    padding-bottom: 2rem;
     // animation: pop-in 50ms forwards ease-in;
     // animation-delay: 1000ms;
     overflow: hidden;
@@ -20,6 +20,8 @@
 
 .button {
     @include m.btn;
+    padding: 0.52em 0.82rem;
+    font-size: 1.3rem;
 }
 
 @keyframes pop-in {

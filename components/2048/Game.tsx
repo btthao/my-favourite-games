@@ -4,8 +4,7 @@ import useGameState, {
   GameState,
   TOTAL_COLS,
 } from 'hooks/use2048State'
-import styles from 'styles/2048/Grid.module.scss'
-import { calculateRenderSize } from 'utils/calculateSize'
+import styles from 'styles/2048/Game.module.scss'
 import Tile from './Tile'
 import { v4 as uuidv4 } from 'uuid'
 import { TILE_GAP_2048 } from '../../constants'
@@ -13,27 +12,21 @@ import GameOverModal from 'components/GameOverModal'
 import useLocalStorage from 'hooks/useLocalStorage'
 import StatusBar from 'components/StatusBar'
 
-interface GridProps {
-  width: number
-  height: number
+interface GameProps {
+  isResizing: boolean
 }
 
 const calculateTileSize = (dimension: number) => {
   return (dimension - TILE_GAP_2048 * (TOTAL_COLS + 1)) / TOTAL_COLS
 }
 
-const Grid: React.FC<GridProps> = ({ width, height }) => {
+const DIMENSION = 400
+
+const Game: React.FC<GameProps> = ({ isResizing }) => {
   const [gameState, setGameState] = useLocalStorage<GameState>(
     '2048',
     DEFAULT_STATE
   )
-  const { renderHeight, renderWidth } = calculateRenderSize({
-    width,
-    height,
-    aspectRatio: 1,
-    maxW: height * 0.77,
-    maxH: height * 0.77,
-  })
 
   const { state, moveDown, moveUp, moveLeft, moveRight, onResize, newGame } =
     useGameState(gameState)
@@ -66,13 +59,17 @@ const Grid: React.FC<GridProps> = ({ width, height }) => {
     }
 
     window.addEventListener('keydown', handleKeyDown)
-    window.addEventListener('resize', onResize)
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown)
-      window.removeEventListener('resize', onResize)
     }
-  }, [moveDown, moveLeft, moveRight, moveUp, onResize, gameOver])
+  }, [moveDown, moveLeft, moveRight, moveUp, gameOver])
+
+  useEffect(() => {
+    if (isResizing) {
+      onResize()
+    }
+  }, [isResizing, onResize])
 
   useEffect(() => {
     setGameState(state)
@@ -97,29 +94,31 @@ const Grid: React.FC<GridProps> = ({ width, height }) => {
           </>
         }
       />
-      <div
-        className={styles.grid}
-        style={{ width: renderWidth, height: renderHeight }}
-      >
-        <div className={styles.cells}>
-          {new Array(16).fill(0).map((_, idx) => (
-            <div key={idx}></div>
-          ))}
+      <div className={styles.inner}>
+        <div
+          className={styles.grid}
+          style={{ width: DIMENSION, height: DIMENSION }}
+        >
+          <div className={styles.cells}>
+            {new Array(16).fill(0).map((_, idx) => (
+              <div key={idx}></div>
+            ))}
+          </div>
+          <div className={styles.tiles}>
+            {activeTiles.map((tile) => (
+              <Tile
+                key={uuidv4()}
+                {...tile}
+                width={calculateTileSize(DIMENSION)}
+                height={calculateTileSize(DIMENSION)}
+              />
+            ))}
+          </div>
         </div>
-        <div className={styles.tiles}>
-          {activeTiles.map((tile) => (
-            <Tile
-              key={uuidv4()}
-              {...tile}
-              width={calculateTileSize(renderWidth)}
-              height={calculateTileSize(renderHeight)}
-            />
-          ))}
-        </div>
+        {gameOver && <GameOverModal onClick={newGame} />}
       </div>
-      {gameOver && <GameOverModal onClick={newGame} />}
     </div>
   )
 }
 
-export default Grid
+export default Game
