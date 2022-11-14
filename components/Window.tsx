@@ -1,9 +1,14 @@
-import { SyntheticEvent, useState } from 'react'
-import { FiMinusSquare, FiPlusSquare, FiXSquare } from 'react-icons/fi'
+import { useRouter } from 'next/router'
+import { SyntheticEvent, useEffect, useState } from 'react'
+import Draggable, {
+  ControlPosition,
+  DraggableEventHandler,
+} from 'react-draggable'
+import { BiExitFullscreen, BiFullscreen } from 'react-icons/bi'
+import { IoCloseSharp } from 'react-icons/io5'
 import { Resizable, ResizeCallbackData } from 'react-resizable'
 import styles from 'styles/Window.module.scss'
 import 'react-resizable/css/styles.css'
-import { useRouter } from 'next/router'
 
 interface WindowProps {
   component: React.ComponentType<any>
@@ -11,6 +16,12 @@ interface WindowProps {
   minW: number
   minH: number
   disableResize?: boolean
+}
+
+type WindowState = {
+  height: number
+  width: number
+  position: ControlPosition
 }
 
 const Window: React.FC<WindowProps> = ({
@@ -21,70 +32,97 @@ const Window: React.FC<WindowProps> = ({
   disableResize = false,
 }) => {
   const router = useRouter()
-  const [height, setHeight] = useState(minH)
-  const [width, setWidth] = useState(minW)
+  const defaultState: WindowState = {
+    height: minH,
+    width: minW,
+    position: {
+      x: (window.innerWidth - minW) / 2,
+      y: (window.innerHeight - minH) / 2,
+    },
+  }
+  const [{ height, position, width }, setWindowState] = useState(defaultState)
+  const [prevState, setPrevState] = useState(defaultState)
   const [isResizing, setIsResizing] = useState(false)
+  const [isFullscreen, setIsFullscreen] = useState(false)
 
-  const onResize = (
-    event: SyntheticEvent,
-    { size, handle }: ResizeCallbackData
-  ) => {
+  const onResize = (_event: SyntheticEvent, { size }: ResizeCallbackData) => {
     if (disableResize) return
-    setHeight(size.height)
-    setWidth(size.width)
+    setWindowState((prev) => {
+      return { ...prev, height: size.height, width: size.width }
+    })
     setIsResizing(true)
   }
 
-  const makeFullscreen = () => {
-    setHeight(window.innerHeight)
-    setWidth(window.innerWidth)
+  const onDrag: DraggableEventHandler = (e, data) => {
+    const { x, y } = data
+    setWindowState((prev) => {
+      return { ...prev, position: { x, y } }
+    })
     setIsResizing(true)
-    setTimeout(() => {
-      setIsResizing(false)
-    }, 100)
   }
+
+  useEffect(() => {
+    if (isFullscreen) {
+      setPrevState({ width, height, position })
+      setWindowState({
+        height: window.innerHeight,
+        width: window.innerWidth,
+        position: { x: 0, y: 0 },
+      })
+    } else {
+      setWindowState(prevState)
+    }
+  }, [isFullscreen])
 
   return (
-    <Resizable
-      width={width}
-      height={height}
-      onResize={onResize}
-      onResizeStop={() => setIsResizing(false)}
-      minConstraints={[minW, minH]}
-      resizeHandles={['se', 'e', 's']}
+    <Draggable
+      handle=".drag-handle"
+      bounds="body"
+      onDrag={onDrag}
+      position={position}
+      onStop={() => setIsResizing(false)}
     >
-      <div
-        className={styles.window + (disableResize ? ' disable-resize' : '')}
-        style={{
-          width: width,
-          height: height,
-        }}
+      <Resizable
+        width={width}
+        height={height}
+        onResize={onResize}
+        onResizeStop={() => setIsResizing(false)}
+        minConstraints={[minW, minH]}
+        resizeHandles={['se', 'e', 's']}
       >
-        <div className={styles['title-bar']}>
-          <div>{title}</div>
-          <div>
-            <button
-              disabled={disableResize}
-              className={styles['maximize-btn']}
-              aria-label="Maximize window"
-              onClick={makeFullscreen}
-            >
-              <FiPlusSquare />
-            </button>
-            <button
-              className={styles['close-btn']}
-              aria-label="Close window"
-              onClick={() => router.push('/')}
-            >
-              <FiXSquare />
-            </button>
+        <div
+          className={styles.window + (disableResize ? ' disable-resize' : '')}
+          style={{
+            width: width,
+            height: height,
+          }}
+        >
+          <div className={styles['title-bar'] + ' drag-handle'}>
+            <div>{title}</div>
+            <div>
+              <button
+                disabled={disableResize}
+                className={styles['maximize-btn']}
+                aria-label="Maximize window"
+                onClick={() => setIsFullscreen((prev) => !prev)}
+              >
+                {isFullscreen ? <BiExitFullscreen /> : <BiFullscreen />}
+              </button>
+              <button
+                className={styles['close-btn']}
+                aria-label="Close window"
+                onClick={() => router.push('/')}
+              >
+                <IoCloseSharp />
+              </button>
+            </div>
+          </div>
+          <div className={styles.inner}>
+            <Component isResizing={isResizing} />
           </div>
         </div>
-        <div className={styles.inner}>
-          <Component isResizing={isResizing} />
-        </div>
-      </div>
-    </Resizable>
+      </Resizable>
+    </Draggable>
   )
 }
 
