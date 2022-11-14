@@ -62,6 +62,7 @@ const Window: React.FC<WindowProps> = ({
   }
 
   useEffect(() => {
+    setIsResizing(true)
     if (isFullscreen) {
       setPrevState({ width, height, position })
       setWindowState({
@@ -72,6 +73,8 @@ const Window: React.FC<WindowProps> = ({
     } else {
       setWindowState(prevState)
     }
+
+    setTimeout(() => setIsResizing(false), 200)
   }, [isFullscreen])
 
   return (

@@ -82,13 +82,13 @@ $theme: '1';
   color: $dark;
   @if $theme == '1' {
     background: #dbe6ea;
-    padding: 0.35em 0.6rem;
+    padding: 0 0.6rem;
     button {
         background: #c3cacc;
     }
   } @else {
     background: $darkpurple;
-    padding: 0.35em 0;
+    padding: 0;
   }
 }
 
