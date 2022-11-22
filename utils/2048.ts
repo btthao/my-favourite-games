@@ -1,100 +1,66 @@
 import produce from 'immer'
+import {
+  BasicTile,
+  getAllEmptyTilesPositions,
+  getAllTilesPositions,
+  getMultipleRandomEmptyTiles,
+  getRandomEmptyTilePosition,
+  Position,
+  putTilesInBoard,
+} from './tile'
 
-export interface TilePos {
-  r: number
-  c: number
-}
-
-export interface TileState {
+export interface TileState extends BasicTile {
   value: number
   isNew?: boolean
   isMerged?: boolean
   toBeRemoved?: boolean
-  position: TilePos
-  prevPosition?: TilePos | null
+  prevPosition?: Position | null
   animationDelay?: number | null
 }
 
 export type ActiveTilesState = TileState[]
 
-export const getAllTilesPos = (row: number, col: number) => {
-  let tiles: TilePos[] = []
-
-  for (let r = 0; r < row; r++) {
-    for (let c = 0; c < col; c++) {
-      tiles.push({ r, c })
-    }
-  }
-
-  return tiles
-}
-
+// constants
 export const TOTAL_ROWS = 4
 export const TOTAL_COLS = 4
 export const TILE_ANIMATION_DELAY = 70
-export const ALL_TILES_POS = getAllTilesPos(TOTAL_ROWS, TOTAL_COLS)
+export const ALL_TILES_POS = getAllTilesPositions(TOTAL_ROWS, TOTAL_COLS)
 
-export const getRandomEmptyTile = (tiles: TilePos[]) => {
-  return tiles[Math.floor(Math.random() * tiles.length)]
-}
+// helper functions
+export const getStartingActiveTiles = (): ActiveTilesState => {
+  const tiles = getMultipleRandomEmptyTiles(ALL_TILES_POS, 2)
 
-export const getEmptyTiles = (
-  activeTiles: ActiveTilesState,
-  allTiles: TilePos[]
-) => {
-  let emptyTiles = allTiles
-  for (const tile of activeTiles) {
-    emptyTiles = emptyTiles.filter(
-      (currTile) =>
-        currTile.c !== tile.position.c || currTile.r !== tile.position.r
-    )
-  }
-
-  return emptyTiles
-}
-
-export const getStartingActiveTiles = (emptyTiles: TilePos[]) => {
-  let activeTiles: ActiveTilesState = []
-
-  while (activeTiles.length < 2) {
-    const { r, c } = getRandomEmptyTile(emptyTiles)
-    emptyTiles = emptyTiles.filter((tile) => tile.c !== c || tile.r !== r)
-    activeTiles.push({
-      value: 2,
-      isNew: true,
-      position: { r, c },
-    })
-  }
-
-  return activeTiles
+  return tiles.map((tile) => {
+    return { ...tile, value: 2, isNew: true }
+  })
 }
 
 export const makeTilesBoard = (
   row: number,
   col: number,
   activeTiles: ActiveTilesState
-) => {
-  let board: TileState[][] = new Array(row).fill(new Array(col).fill(null))
+): TileState[][] => {
+  const callback = (tile: TileState) => {
+    return !tile.toBeRemoved
+  }
 
-  board = produce(board, (draft) => {
-    for (const tile of activeTiles) {
-      // remove tiles with toBeRemoved = true
-      if (tile.toBeRemoved) continue
-      const { r, c } = tile.position
-      draft[r][c] = {
-        ...tile,
-        isNew: false,
-        isMerged: false,
-        prevPosition: null,
-        animationDelay: null,
-      }
-    }
-  })
+  const resetTileState: Partial<TileState> = {
+    isNew: false,
+    isMerged: false,
+    prevPosition: null,
+    animationDelay: null,
+  }
 
-  return board
+  return putTilesInBoard<TileState>(
+    row,
+    col,
+    activeTiles,
+    callback,
+    resetTileState
+  )
 }
 
-export const isGameOver = (activeTiles: ActiveTilesState) => {
+export const isGameOver = (activeTiles: ActiveTilesState): boolean => {
   let board = makeTilesBoard(TOTAL_ROWS, TOTAL_COLS, activeTiles)
   for (let r = 0; r < TOTAL_ROWS; r++) {
     for (let c = 0; c < TOTAL_COLS; c++) {
@@ -117,15 +83,16 @@ export const updateGameState = ({
   tilesMoved: boolean
   activeTiles: ActiveTilesState
 }) => {
+  // add new tile if game not over, return gameover state
   if (tilesMoved) {
-    const emptyTiles = getEmptyTiles(activeTiles, ALL_TILES_POS)
+    const emptyTiles = getAllEmptyTilesPositions(activeTiles, ALL_TILES_POS)
     if (emptyTiles.length) {
       activeTiles = [
         ...activeTiles,
         {
           isNew: true,
           value: 2,
-          position: getRandomEmptyTile(emptyTiles),
+          position: getRandomEmptyTilePosition(emptyTiles),
         },
       ]
     }
@@ -142,11 +109,12 @@ export const mergeTiles = ({
   animationDelay,
 }: {
   tiles: TileState[]
-  position: TilePos
+  position: Position
   idx: number
   mergedValue: number
   animationDelay: number
-}) => {
+}): TileState[] => {
+  // delay merge animation until tile has reached new position
   tiles = produce(tiles, (draft) => {
     let count = 0
     while (++count <= 2) {
@@ -174,8 +142,8 @@ export const mergeTiles = ({
 export const filterActiveTiles = (
   activeTiles: ActiveTilesState,
   fromPreviousGame: boolean
-) => {
-  let newActiveTiles = []
+): TileState[] => {
+  let newActiveTiles: TileState[] = []
   for (const tile of activeTiles) {
     if (tile.toBeRemoved) continue
     newActiveTiles.push({

@@ -1,15 +1,15 @@
 import { useCallback, useReducer } from 'react'
 import {
-    ActiveTilesState,
-    ALL_TILES_POS,
-    getStartingActiveTiles,
-    makeTilesBoard,
-    mergeTiles, TileState,
-    TILE_ANIMATION_DELAY,
-    TOTAL_COLS,
-    TOTAL_ROWS,
-    updateGameState,
-    filterActiveTiles
+  ActiveTilesState,
+  getStartingActiveTiles,
+  makeTilesBoard,
+  mergeTiles,
+  TileState,
+  TILE_ANIMATION_DELAY,
+  TOTAL_COLS,
+  TOTAL_ROWS,
+  updateGameState,
+  filterActiveTiles,
 } from 'utils/2048'
 
 const ACTION_TYPE_MOVE_DOWN = 'move-down'
@@ -296,7 +296,7 @@ function reduce(
         bestScore: Math.max(score, state.bestScore),
       }
     }
-    
+
     case ACTION_TYPE_MOVE_LEFT: {
       const { activeTiles } = state
       if (!activeTiles.length) return state
@@ -396,7 +396,7 @@ function reduce(
     case ACTION_TYPE_NEW_GAME: {
       return {
         ...DEFAULT_STATE,
-        activeTiles: getStartingActiveTiles(ALL_TILES_POS),
+        activeTiles: getStartingActiveTiles(),
         bestScore: state.bestScore,
       }
     }
@@ -414,7 +414,7 @@ const useGameState = (initialState: GameState) => {
       return {
         ...initialState,
         activeTiles: gameOver
-          ? getStartingActiveTiles(ALL_TILES_POS)
+          ? getStartingActiveTiles()
           : filterActiveTiles(initialState.activeTiles, true),
         score: gameOver ? 0 : score,
         gameOver: false,
@@ -422,7 +422,7 @@ const useGameState = (initialState: GameState) => {
     } else {
       return {
         ...DEFAULT_STATE,
-        activeTiles: getStartingActiveTiles(ALL_TILES_POS),
+        activeTiles: getStartingActiveTiles(),
       }
     }
   })
