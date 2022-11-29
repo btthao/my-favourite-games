@@ -87,12 +87,19 @@ export const putTilesInBoard = <T extends BasicTile>(
 
 export const checkClickOnActiveTile = <T extends BasicTile>(
   position: Position,
-  activeTiles: T[]
+  activeTiles: T[],
+  callback: (tile: T) => boolean = () => {
+    return true
+  }
 ) => {
   let idx = -1
 
   const clickedTile = activeTiles.filter((tile, i) => {
-    if (tile.position.c == position.c && tile.position.r == position.r) {
+    if (
+      tile.position.c == position.c &&
+      tile.position.r == position.r &&
+      callback(tile)
+    ) {
       idx = i
       return true
     }

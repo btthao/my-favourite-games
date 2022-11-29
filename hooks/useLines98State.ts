@@ -1,29 +1,39 @@
-import { getCanvasPosition, SIZE } from './../utils/lines98'
 import produce from 'immer'
 import { useCallback, useReducer } from 'react'
-import { partition } from 'utils/helpers'
+import { selectRandomFromList } from 'utils/helpers'
 import {
+  ALL_TILES_POS,
   BallState,
   BALL_BOUNCE_SPEED,
-  findSelectedBall,
+  colors,
+  createBall,
+  DIMENSION,
+  findClickedBall,
+  getBallSize,
+  getCanvasPosition,
   getStartingBalls,
+  SIZE,
 } from 'utils/lines98'
-import { Position } from 'utils/tile'
+import {
+  getAllEmptyTilesPositions,
+  getMultipleRandomEmptyTiles,
+  getRandomEmptyTilePosition,
+  Position,
+} from 'utils/tile'
 
-const ACTION_TYPE_SELECT = 'select'
+const ACTION_TYPE_CLICK = 'click'
 const ACTION_TYPE_BOUNCE_SELECTED_BALL = 'bounce'
-const ACTION_TYPE_MOVE = 'move'
 
 export interface GameState {
   balls: BallState[]
   gameOver: boolean
-  gameState: 'selected' | 'moving' | 'new-cycle'
+  currentState: 'selected' | 'moving' | 'new-cycle'
 }
 
 export const DEFAULT_STATE: GameState = {
   balls: [],
   gameOver: false,
-  gameState: 'new-cycle',
+  currentState: 'new-cycle',
 }
 
 function reduce(
@@ -33,67 +43,131 @@ function reduce(
   const { type, payload } = action
 
   switch (type) {
-    case ACTION_TYPE_SELECT: {
-      if (!payload?.position || state.gameState === 'moving') return state
+    case ACTION_TYPE_CLICK: {
+      if (!payload?.position || state.currentState == 'moving') return state
 
       let balls = [...state.balls]
-      let gameState = state.gameState
+      let currentState = state.currentState
 
-      const { selectedBall, selectedBallIdx } = findSelectedBall(
+      //   check if there's an active ball where user clicks
+      const { clickedBall, clickedBallIdx } = findClickedBall(
         payload.position,
         balls
       )
 
-      //   whether there's a ball selected or not, when click on an active ball => change selected ball to the new one
-      if (selectedBall?.isActive && selectedBallIdx > -1) {
-        console.log('ball selected', selectedBall.color)
-        balls = balls.map((ball, idx) => {
-          if (idx === selectedBallIdx) {
-            return { ...ball, isSelected: true }
+      if (clickedBall && clickedBallIdx > -1) {
+        //  when click on an active ball => change selected ball to this one
+        console.log('ball selected', clickedBall.color)
+        balls = produce(balls, (draft) => {
+          for (let i = 0; i < draft.length; i++) {
+            if (draft[i].isSelected) {
+              // reset position if this ball is bouncing
+              draft[i].canvasPosition.x = draft[i].canvasPosition.originalX
+              draft[i].canvasPosition.y = draft[i].canvasPosition.originalY
+            }
+            draft[i].isSelected = i === clickedBallIdx
           }
+        })
+        currentState = 'selected'
+      } else if (
+        currentState == 'selected' &&
+        (!clickedBall || !clickedBall?.isActive)
+      ) {
+        //  there's already a ball selected and user wants to move ball. user can move ball to an empty tile or tile with an inactive ball
+        let clickedOnInactiveBall = false
 
-          return { ...ball, isSelected: false }
+        //   if clicked on inactive ball => remove that inactive ball. it will be replaced later
+        balls = balls.filter((ball) => {
+          if (
+            ball.position.c === payload.position?.c &&
+            ball.position.r === payload.position?.r
+          ) {
+            clickedOnInactiveBall = true
+            return false
+          }
+          return true
         })
 
-        gameState = 'selected'
-      }
+        balls = produce(balls, (draft) => {
+          for (let i = 0; i < draft.length; i++) {
+            if (draft[i].isSelected) {
+              //  change selected ball position and deselect
+              const { r, c } = payload.position as Position
+              const [x, y] = [getCanvasPosition(c), getCanvasPosition(r)]
+              draft[i].position = { r, c }
+              draft[i].canvasPosition = {
+                originalX: x,
+                originalY: y,
+                x,
+                y,
+              }
+              draft[i].isSelected = false
+            }
 
-      //   if a ball is already selected and click on empty tile => check if can move ball there
-      if (gameState === 'selected' && !selectedBall) {
-        //   check if empty
-      }
+            // make inactive balls active
+            if (!draft[i].isActive) {
+              draft[i].isActive = true
+              draft[i].size = getBallSize(true)
+            }
+          }
+        })
 
-      console.log(balls)
+        //   add new balls, add one extra one if clicked on inactive ball
+        let emptyTiles = getAllEmptyTilesPositions(balls, ALL_TILES_POS)
+        const totalNewBalls = clickedOnInactiveBall ? 4 : 3
+
+        if (emptyTiles.length) {
+          const newPositions = getMultipleRandomEmptyTiles(
+            emptyTiles,
+            Math.min(totalNewBalls, emptyTiles.length)
+          )
+          for (let i = 0; i < newPositions.length; i++) {
+            balls = [
+              ...balls,
+              createBall(
+                newPositions[i].position,
+                clickedOnInactiveBall && i == 0
+              ),
+            ]
+          }
+        }
+      }
 
       return {
         ...state,
         balls,
-        gameState,
+        currentState,
       }
     }
 
     case ACTION_TYPE_BOUNCE_SELECTED_BALL: {
-      const { balls } = state
-      const [selected, rest] = partition(balls, (ball) => ball.isSelected)
+      console.log('bounce')
+      if (state.currentState !== 'selected') return state
 
-      if (selected.length !== 1) return state
-      console.log('ball bouncing', selected.length, selected[0].color)
+      let balls = state.balls
 
-      const { canvasPosition, movingDirection } = selected[0]
+      balls = produce(balls, (draft) => {
+        for (let i = 0; i < draft.length; i++) {
+          const { canvasPosition, movingDirection, isSelected } = draft[i]
+          if (isSelected) {
+            //   change position
+            draft[i].canvasPosition.y =
+              canvasPosition.y + BALL_BOUNCE_SPEED * movingDirection.y
 
-      selected[0].canvasPosition.y =
-        canvasPosition.y + BALL_BOUNCE_SPEED * movingDirection.y
-
-      if (
-        canvasPosition.y <= canvasPosition.boundTop ||
-        canvasPosition.y >= canvasPosition.boundBottom
-      ) {
-        selected[0].movingDirection.y = movingDirection.y == 1 ? -1 : 1
-      }
+            //  change direction when going out of tile border
+            if (
+              Math.abs(canvasPosition.originalY - canvasPosition.y) >=
+              (DIMENSION * 0.1) / SIZE
+            ) {
+              draft[i].movingDirection.y = movingDirection.y == 1 ? -1 : 1
+            }
+          }
+        }
+      })
 
       return {
         ...state,
-        balls: [...selected, ...rest],
+        balls,
       }
     }
 
@@ -120,15 +194,15 @@ const useGameState = (initialState: GameState) => {
     }
   })
 
-  const selectBall = useCallback((position: Position) => {
-    dispatch({ type: ACTION_TYPE_SELECT, payload: { position } })
+  const click = useCallback((position: Position) => {
+    dispatch({ type: ACTION_TYPE_CLICK, payload: { position } })
   }, [])
 
   const bounceSelectedBall = useCallback(() => {
     dispatch({ type: ACTION_TYPE_BOUNCE_SELECTED_BALL })
   }, [])
 
-  return { state, selectBall, bounceSelectedBall }
+  return { state, click, bounceSelectedBall }
 }
 
 export default useGameState

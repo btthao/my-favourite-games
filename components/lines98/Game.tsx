@@ -1,95 +1,64 @@
-import React, { useRef, useEffect, useState } from 'react'
-import p5 from 'p5'
 import useGameState, { DEFAULT_STATE, GameState } from 'hooks/useLines98State'
-import styles from 'styles/lines98/Game.module.scss'
-import StatusBar from 'components/StatusBar'
 import useLocalStorage from 'hooks/useLocalStorage'
-import { createBall, DIMENSION, getStartingBalls, SIZE } from 'utils/lines98'
+import p5Types from 'p5'
+import Sketch from 'react-p5'
+import styles from 'styles/lines98/Game.module.scss'
+import { DIMENSION, SIZE } from 'utils/lines98'
 
 const Game = () => {
-  const containerRef = useRef<HTMLDivElement>(null)
   const [gameState, setGameState] = useLocalStorage<GameState>(
     'lines98',
     DEFAULT_STATE
   )
 
-  const { selectBall, state, bounceSelectedBall } = useGameState(gameState)
-  const { balls, gameOver, board } = state
+  const { click, state, bounceSelectedBall } = useGameState(gameState)
+  const { balls, gameOver } = state
 
-  const Sketch = (p: any) => {
-    p.setup = () => {
-      p.createCanvas(DIMENSION, DIMENSION)
+  const setup = (p5: p5Types, canvasParentRef: Element) => {
+    p5.createCanvas(DIMENSION, DIMENSION).parent(canvasParentRef)
+  }
+
+  const draw = (p5: p5Types) => {
+    p5.background('#BAC3C6')
+
+    // draw lines
+    p5.stroke('#b3a199')
+    for (let i = 1; i < SIZE; i++) {
+      p5.line((i * DIMENSION) / SIZE, 0, (i * DIMENSION) / SIZE, DIMENSION)
+      p5.line(0, (i * DIMENSION) / SIZE, DIMENSION, (i * DIMENSION) / SIZE)
     }
 
-    p.draw = () => {
-      bounceSelectedBall()
+    // draw balls
+    p5.noStroke()
+    for (let i = 0; i < balls.length; i++) {
+      const { color, canvasPosition, size, isSelected } = balls[i]
+      const { x, y } = canvasPosition
 
-      p.background('#BAC3C6')
-
-      // draw lines
-      p.stroke('#b3a199')
-      for (let i = 1; i < SIZE; i++) {
-        p.line((i * DIMENSION) / SIZE, 0, (i * DIMENSION) / SIZE, DIMENSION)
-        p.line(0, (i * DIMENSION) / SIZE, DIMENSION, (i * DIMENSION) / SIZE)
+      if (isSelected) {
+        bounceSelectedBall()
       }
 
-      // draw balls
-      p.noStroke()
-
-      //   console.log('total balls', balls.length)
-
-      for (let i = 0; i < balls.length; i++) {
-        const { color, isMoving, isSelected, canvasPosition, size } = balls[i]
-        const { x, y } = canvasPosition
-
-        console.log(isSelected)
-
-        p.fill(color)
-
-        p.ellipse(x, y, size)
-      }
-    }
-
-    p.mouseClicked = () => {
-      const { mouseX, mouseY, floor } = p
-
-      let c = floor((mouseX / DIMENSION) * SIZE)
-      let r = floor((mouseY / DIMENSION) * SIZE)
-
-      selectBall({ r, c })
-
-      // Passing information from the child up to the parent
+      p5.fill(color)
+      p5.ellipse(x, y, size)
     }
   }
 
-  useEffect(() => {
-    if (containerRef.current) {
-      containerRef.current.innerHTML = ''
-      new p5(Sketch, containerRef.current)
-    }
-  }, [])
+  const mouseClicked = (p5: p5Types) => {
+    const { mouseX, mouseY, floor } = p5
 
-  // Note: you're going to want to defined an element to contain the p5.js canvas
+    let c = floor((mouseX / DIMENSION) * SIZE)
+    let r = floor((mouseY / DIMENSION) * SIZE)
+
+    click({ r, c })
+  }
+
   return (
     <div className={styles.container}>
+      <div></div>
       <div>
-        {/* <StatusBar
-          won={false}
-          gameOver={gameOver}
-          onClick={() => console.log('hi')}
-          leftComponent={
-            <>
-              <div>Score</div>
-            </>
-          }
-          rightComponent={
-            <>
-              <div>Best</div>
-            </>
-          }
-        /> */}
+        {/* @ts-ignore */}
+        <Sketch setup={setup} draw={draw} mouseClicked={mouseClicked} />
       </div>
-      <div ref={containerRef}></div>
     </div>
   )
 }
