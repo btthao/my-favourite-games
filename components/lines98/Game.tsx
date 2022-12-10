@@ -3,16 +3,31 @@ import useLocalStorage from 'hooks/useLocalStorage'
 import p5Types from 'p5'
 import Sketch from 'react-p5'
 import styles from 'styles/lines98/Game.module.scss'
-import { DIMENSION, SIZE } from 'utils/lines98'
+import { DIMENSION, isClickOnActiveBall, SIZE } from 'utils/lines98'
 
 const Game = () => {
-  const [gameState, setGameState] = useLocalStorage<GameState>(
-    'lines98',
-    DEFAULT_STATE
-  )
+  const [gameState, setGameState] = useLocalStorage<GameState>('lines98', DEFAULT_STATE)
 
-  const { click, state, bounceSelectedBall } = useGameState(gameState)
-  const { balls, gameOver } = state
+  const { moveSelectedBall, selectBall, selectDestination, bounceSelectedBall, state, restart, growBalls, shrinkBalls } = useGameState(gameState)
+  const { balls, score, currentState, isAnimating } = state
+
+  const reorderBalls = () => {
+    const activeBalls = []
+    const inactiveBalls = []
+    const movingBall = []
+    for (const ball of balls) {
+      if (ball.isMoving) {
+        movingBall.push(ball)
+      } else if (ball.isActive) {
+        activeBalls.push(ball)
+      } else {
+        inactiveBalls.push(ball)
+      }
+    }
+    return [...inactiveBalls, ...activeBalls, ...movingBall]
+  }
+
+  const ballsWithCorrectRenderOrder = reorderBalls()
 
   const setup = (p5: p5Types, canvasParentRef: Element) => {
     p5.createCanvas(DIMENSION, DIMENSION).parent(canvasParentRef)
@@ -30,13 +45,19 @@ const Game = () => {
 
     // draw balls
     p5.noStroke()
-    for (let i = 0; i < balls.length; i++) {
-      const { color, canvasPosition, size, isSelected } = balls[i]
-      const { x, y } = canvasPosition
 
-      if (isSelected) {
-        bounceSelectedBall()
-      }
+    if (currentState === 'selected') {
+      bounceSelectedBall()
+    } else if (currentState === 'moving') {
+      moveSelectedBall()
+    } else if (isAnimating) {
+      growBalls()
+      shrinkBalls()
+    }
+
+    for (let i = 0; i < ballsWithCorrectRenderOrder.length; i++) {
+      const { color, canvasPosition, size } = ballsWithCorrectRenderOrder[i]
+      const { x, y } = canvasPosition
 
       p5.fill(color)
       p5.ellipse(x, y, size)
@@ -49,12 +70,24 @@ const Game = () => {
     let c = floor((mouseX / DIMENSION) * SIZE)
     let r = floor((mouseY / DIMENSION) * SIZE)
 
-    click({ r, c })
+    if (isClickOnActiveBall({ r, c }, balls)) {
+      selectBall({ r, c })
+    } else if (r >= 0 && c >= 0) {
+      selectDestination({ r, c })
+    }
   }
 
   return (
     <div className={styles.container}>
-      <div></div>
+      <div
+        onClick={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          restart()
+        }}
+      >
+        {score}
+      </div>
       <div>
         {/* @ts-ignore */}
         <Sketch setup={setup} draw={draw} mouseClicked={mouseClicked} />
