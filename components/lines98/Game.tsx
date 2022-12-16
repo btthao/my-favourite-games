@@ -3,6 +3,7 @@ import useLocalStorage from 'hooks/useLocalStorage'
 import p5Types from 'p5'
 import Sketch from 'react-p5'
 import styles from 'styles/lines98/Game.module.scss'
+import { adjustColor } from 'utils/helpers'
 import { DIMENSION, isClickOnActiveBall, SIZE } from 'utils/lines98'
 
 const Game = () => {
@@ -58,9 +59,13 @@ const Game = () => {
     for (let i = 0; i < ballsWithCorrectRenderOrder.length; i++) {
       const { color, canvasPosition, size } = ballsWithCorrectRenderOrder[i]
       const { x, y } = canvasPosition
+      const d = size / 2
 
-      p5.fill(color)
-      p5.ellipse(x, y, size)
+      const gradient = p5.drawingContext.createLinearGradient(x + d, y - d, x - d, y + d)
+      gradient.addColorStop(0.25, adjustColor(color, 25))
+      gradient.addColorStop(0.75, adjustColor(color, -85))
+      p5.drawingContext.fillStyle = gradient
+      p5.rect(x - d, y - d, size, size, size)
     }
   }
 

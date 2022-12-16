@@ -1,7 +1,7 @@
 import { selectRandomFromList } from './helpers'
 import { BasicTile, checkClickOnActiveTile, getAllTilesPositions, getMultipleRandomEmptyTiles, Position, putTilesInBoard } from './tile'
 
-export const colors = ['#00b7ff', '#8a4add', '#19b05f', '#5c014a', '#dd545b', '#f88d13']
+export const colors = ['#19b05f', '#9a62e3', '#2fadcc', '#e636a8', '#9D2D18', '#F6D102']
 export type BallColor = typeof colors[number]
 
 export interface BallState extends BasicTile {
@@ -42,7 +42,7 @@ export const SIZE = 9
 export const ALL_TILES_POS = getAllTilesPositions(SIZE, SIZE)
 export const BALL_BOUNCE_SPEED = 0.25
 export const BIG_BALL_SIZE = DIMENSION / (1.45 * SIZE)
-export const SMALL_BALL_SIZE = DIMENSION / (4.5 * SIZE)
+export const SMALL_BALL_SIZE = DIMENSION / (4 * SIZE)
 
 // helper functions
 export const getStartingBalls = (): BallState[] => {
