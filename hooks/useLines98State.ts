@@ -1,6 +1,6 @@
 import produce from 'immer'
 import { useCallback, useEffect, useReducer } from 'react'
-import { ALL_TILES_POS, BallState, BALL_BOUNCE_SPEED, BALL_MOVE_SPEED, findConsecutiveBalls, createBall, DIMENSION, getCanvasPosition, getStartingBalls, SIZE, getBallSize } from 'utils/lines98'
+import { ALL_TILES_POS, BallState, BALL_BOUNCE_SPEED, findConsecutiveBalls, createBall, DIMENSION, getCanvasPosition, getStartingBalls, SIZE, getBallSize, findPath } from 'utils/lines98'
 import { getAllEmptyTilesPositions, getMultipleRandomEmptyTiles, Position } from 'utils/tile'
 
 const ACTION_TYPE_SELECT_BALL = 'select-ball'
@@ -88,16 +88,21 @@ function reduce(state: GameState, action: { payload?: { position?: Position; bal
     case ACTION_TYPE_SELECT_DESTINATION: {
       if (!payload?.position || state.currentState !== 'selected' || state.isAnimating) return state
 
+      const path = findPath(state.balls, state.balls.filter((b) => b.isSelected)[0].position, payload.position)
+      //   if there's no possible path to destination, stop here
+      if (!path.length) return state
+
       const { x, y } = getCanvasPosition(payload.position)
 
       const balls = produce(state.balls, (draft) => {
         for (let i = 0; i < draft.length; i++) {
           if (draft[i].isSelected) {
             const { originalX, originalY } = draft[i].canvasPosition
-            //   set new position, on canvas, set originalPosition as destination but current is the old one
+            //   set new position on canvas, set originalPosition as destination but current is the old one
             draft[i].isMoving = true
             draft[i].position = payload.position as Position
             draft[i].canvasPosition = { x: originalX, y: originalY, originalX: x, originalY: y }
+            draft[i].movingPath = path
           }
         }
       })
@@ -118,29 +123,20 @@ function reduce(state: GameState, action: { payload?: { position?: Position; bal
       balls = produce(balls, (draft) => {
         for (let i = 0; i < draft.length; i++) {
           if (draft[i].isMoving) {
-            const { originalX, originalY, x, y } = draft[i].canvasPosition
+            //   change position to the next node we already set in movingPath
+            const nextPos = draft[i].movingPath?.pop()
 
-            if (Math.abs(y - originalY) <= 20) {
-              draft[i].canvasPosition.y = originalY
-            } else {
-              draft[i].movingDirection.y = y > originalY ? -1 : 1
-              draft[i].canvasPosition.y = y + BALL_MOVE_SPEED * draft[i].movingDirection.y
-            }
-
-            if (Math.abs(x - originalX) <= 20) {
-              draft[i].canvasPosition.x = originalX
-            } else {
-              draft[i].movingDirection.x = x > originalX ? -1 : 1
-              draft[i].canvasPosition.x = x + BALL_MOVE_SPEED * draft[i].movingDirection.x
-            }
-
-            //   if arrive at destination
-            if (x === originalX && y === originalY) {
+            if (!nextPos) {
+              // have arrived at destination
               draft[i].isSelected = false
               draft[i].isMoving = false
               // @ts-ignore
               currentState = 'update-score'
+              break
             }
+            //  update position
+            draft[i].canvasPosition.y = nextPos.y
+            draft[i].canvasPosition.x = nextPos.x
           }
         }
       })
@@ -191,7 +187,6 @@ function reduce(state: GameState, action: { payload?: { position?: Position; bal
     }
 
     case ACTION_TYPE_ADD_BALLS: {
-      console.log('add balls')
       let balls = state.balls
       let isAnimating = state.isAnimating
 
@@ -243,8 +238,6 @@ function reduce(state: GameState, action: { payload?: { position?: Position; bal
     }
 
     case ACTION_TYPE_GROW_BALLS: {
-      console.log('grow balls')
-
       let isAnimating = state.isAnimating
 
       const balls = produce(state.balls, (draft) => {
@@ -271,8 +264,6 @@ function reduce(state: GameState, action: { payload?: { position?: Position; bal
     }
 
     case ACTION_TYPE_SHRINK_BALLS: {
-      console.log('shrinking balls')
-
       let isAnimating = state.isAnimating
 
       let balls = produce(state.balls, (draft) => {

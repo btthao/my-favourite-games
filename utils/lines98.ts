@@ -1,7 +1,7 @@
 import { selectRandomFromList } from './helpers'
 import { BasicTile, checkClickOnActiveTile, getAllTilesPositions, getMultipleRandomEmptyTiles, Position, putTilesInBoard } from './tile'
 
-export const colors = ['red', 'orange', 'yellow', 'green', 'blue', 'pink']
+export const colors = ['#00b7ff', '#8a4add', '#19b05f', '#5c014a', '#dd545b', '#f88d13']
 export type BallColor = typeof colors[number]
 
 export interface BallState extends BasicTile {
@@ -22,6 +22,18 @@ export interface BallState extends BasicTile {
     x: 1 | -1
     y: 1 | -1
   }
+  movingPath?: { x: number; y: number }[]
+}
+
+// to find optimal path
+interface PathNode {
+  position: Position
+  f: number // cost from start to finish through this node, f = g+h
+  g: number // cost from start to this node
+  h: number // cost from this node to end
+  neighbors: PathNode[]
+  previous?: PathNode
+  block: boolean // whether we can travel through this node
 }
 
 // Constants
@@ -29,7 +41,8 @@ export const DIMENSION = 495
 export const SIZE = 9
 export const ALL_TILES_POS = getAllTilesPositions(SIZE, SIZE)
 export const BALL_BOUNCE_SPEED = 0.25
-export const BALL_MOVE_SPEED = 12
+export const BIG_BALL_SIZE = DIMENSION / (1.45 * SIZE)
+export const SMALL_BALL_SIZE = DIMENSION / (4.5 * SIZE)
 
 // helper functions
 export const getStartingBalls = (): BallState[] => {
@@ -67,7 +80,7 @@ export const createBall = (position: Position, isActive: boolean, defaultValue?:
 }
 
 export const getBallSize = (isActive: boolean) => {
-  return DIMENSION / ((isActive ? 1.4 : 4.5) * SIZE)
+  return isActive ? BIG_BALL_SIZE : SMALL_BALL_SIZE
 }
 
 export const isClickOnActiveBall = (position: Position, balls: BallState[]) => {
@@ -163,4 +176,151 @@ export const findConsecutiveBalls = (balls: BallState[]) => {
   }
 
   return ballsToRemove
+}
+
+// path finding astar algo
+const dist = (a: Position, b: Position) => {
+  let d = Math.abs(a.c - b.c) + Math.abs(a.r - b.r)
+  return d
+}
+
+const addNeighbors = ({ c, r }: Position, board: PathNode[][]) => {
+  const neighbors = []
+
+  if (r < SIZE - 1) {
+    neighbors.push(board[r + 1][c])
+  }
+  if (r > 0) {
+    neighbors.push(board[r - 1][c])
+  }
+  if (c < SIZE - 1) {
+    neighbors.push(board[r][c + 1])
+  }
+  if (c > 0) {
+    neighbors.push(board[r][c - 1])
+  }
+
+  return neighbors
+}
+
+// use this if want ball to move slower by adding extra points between every 2 nodes in path
+export const transformPath = (path: Position[]) => {
+  //   transforming node position to position in canvas for animation effect
+  if (!path.length) return []
+
+  let updatedPath: { x: number; y: number }[] = []
+
+  let num = 2
+  let speed = DIMENSION / (SIZE * (num + 1))
+  // add 2 extra points between every two nodes
+
+  for (let i = 0; i < path.length; i++) {
+    updatedPath.push(getCanvasPosition(path[i]))
+    if (i < path.length - 1) {
+      for (let k = 0; k < num; k++) {
+        //   initialize extra points with this coordinate, will update correct position later
+        updatedPath.push({ x: 0, y: 0 })
+      }
+    }
+  }
+
+  // traverse to update positions of new points
+  for (let i = 1; i < updatedPath.length - 1; i += num + 1) {
+    const prevNode = updatedPath[i - 1]
+    const nextNode = updatedPath[i + num]
+
+    let xDirection = prevNode.x === nextNode.x ? 0 : prevNode.x < nextNode.x ? 1 : -1
+    let yDirection = prevNode.y === nextNode.y ? 0 : prevNode.y < nextNode.y ? 1 : -1
+
+    for (let k = 0; k < num; k++) {
+      updatedPath[i + k].x = prevNode.x + (k + 1) * speed * xDirection
+      updatedPath[i + k].y = prevNode.y + (k + 1) * speed * yDirection
+    }
+  }
+
+  return updatedPath
+}
+
+export const findPath = (balls: BallState[], start: Position, end: Position) => {
+  let openSet: PathNode[] = []
+  let closedSet: PathNode[] = []
+
+  let board: PathNode[][] = []
+  let path: Position[] = []
+  let current: PathNode | undefined
+
+  // initialize board
+  for (let r = 0; r < SIZE; r++) {
+    board.push([])
+    for (let c = 0; c < SIZE; c++) {
+      board[r].push({ position: { r, c }, f: 0, g: 0, h: 0, neighbors: [], block: false })
+    }
+  }
+
+  //loop through current balls. if ball is active then the node at that position will be a block
+  for (const ball of balls) {
+    if (ball.isActive) {
+      const { r, c } = ball.position
+      board[r][c].block = true
+    }
+  }
+
+  // add neighbors for each node
+  for (let r = 0; r < SIZE; r++) {
+    for (let c = 0; c < SIZE; c++) {
+      board[r][c].neighbors = addNeighbors({ r, c }, board)
+    }
+  }
+
+  // add starting point to open set
+  openSet.push(board[start.r][start.c])
+
+  //   time to traverse and check each node
+  while (openSet.length) {
+    //   find the node with lowest f score
+    let winner = 0
+    for (let i = 0; i < openSet.length; i++) {
+      if (openSet[i].f < openSet[winner].f) {
+        winner = i
+      }
+    }
+
+    //   set current to node with lowest f score => most optimal node
+    current = openSet[winner]
+
+    //  if current is the same as our destination, we have arrived
+    if (current.position.c === end.c && current.position.r === end.r) {
+      // go back to each node's previous to form the path from start to end
+      while (current) {
+        path.push(current.position)
+        current = current.previous
+      }
+      break
+    }
+
+    // if we haven't arrived yet
+    // move current from open to closed set
+    openSet = openSet.filter((_p, idx) => idx !== winner)
+    closedSet.push(current)
+
+    //  find the next node in path by checking current's neighbors
+    for (const neighbor of current.neighbors) {
+      if (neighbor.block) continue
+      // only check if it's not a block and not already in closed set
+      if (!closedSet.includes(neighbor)) {
+        //   add 1 because we make one more step from current
+        const tempG = current.g + 1
+        neighbor.g = Math.min(tempG, neighbor.g)
+        neighbor.h = dist(neighbor.position, end)
+        neighbor.f = neighbor.g + neighbor.h
+        neighbor.previous = current
+        if (!openSet.includes(neighbor)) {
+          openSet.push(neighbor)
+        }
+      }
+    }
+  }
+
+  // convert row and col to actual position in canvas
+  return path.map((p) => getCanvasPosition(p))
 }
