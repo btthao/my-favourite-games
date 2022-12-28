@@ -1,3 +1,4 @@
+import StatusBar from 'components/StatusBar'
 import useGameState, { DEFAULT_STATE, GameState } from 'hooks/useLines98State'
 import useLocalStorage from 'hooks/useLocalStorage'
 import p5Types from 'p5'
@@ -9,8 +10,8 @@ import { DIMENSION, isClickOnActiveBall, SIZE } from 'utils/lines98'
 const Game = () => {
   const [gameState, setGameState] = useLocalStorage<GameState>('lines98', DEFAULT_STATE)
 
-  const { moveSelectedBall, selectBall, selectDestination, bounceSelectedBall, state, restart, growBalls, shrinkBalls } = useGameState(gameState)
-  const { balls, score, currentState, isAnimating } = state
+  const { moveSelectedBall, selectBall, selectDestination, bounceSelectedBall, state, restart, growBalls, shrinkBalls, undo } = useGameState(gameState)
+  const { balls, score, currentState, isAnimating, prevBalls, gameOver } = state
 
   const reorderBalls = () => {
     const activeBalls = []
@@ -35,7 +36,7 @@ const Game = () => {
   }
 
   const draw = (p5: p5Types) => {
-    p5.background('#d3d5d5')
+    p5.background('#d6e0e4')
 
     // draw lines
     p5.stroke('#a0a3ae')
@@ -84,15 +85,25 @@ const Game = () => {
 
   return (
     <div className={styles.container}>
-      <div
-        onClick={(e) => {
-          e.preventDefault()
-          e.stopPropagation()
-          restart()
-        }}
-      >
-        {score}
-      </div>
+      <StatusBar
+        won={false}
+        gameOver={gameOver}
+        restart={restart}
+        undo={undo}
+        disableUndo={!prevBalls.length}
+        leftComponent={
+          <>
+            <div>{score}</div>
+            <div>Score</div>
+          </>
+        }
+        rightComponent={
+          <>
+            <div>0</div>
+            <div>Best</div>
+          </>
+        }
+      />
       <div>
         {/* @ts-ignore */}
         <Sketch setup={setup} draw={draw} mouseClicked={mouseClicked} />

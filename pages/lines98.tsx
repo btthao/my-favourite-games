@@ -11,15 +11,7 @@ const Game = dynamic(() => import('components/lines98/Game'), {
 
 // recalculate minH and W based on window size
 const Lines98: NextPage = () => {
-  return (
-    <Window
-      minH={620}
-      minW={500}
-      component={Game}
-      title="Lines 98"
-      disableResize
-    ></Window>
-  )
+  return <Window minH={626} minW={500} component={Game} title="Lines 98" disableResize></Window>
 }
 
 export default Lines98

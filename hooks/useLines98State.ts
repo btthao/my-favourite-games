@@ -12,6 +12,7 @@ const ACTION_TYPE_ADD_BALLS = 'add-balls'
 const ACTION_TYPE_GROW_BALLS = 'grow-balls'
 const ACTION_TYPE_SHRINK_BALLS = 'shrink-balls'
 const ACTION_TYPE_RESTART = 'restart'
+const ACTION_TYPE_UNDO = 'undo'
 
 export interface GameState {
   balls: BallState[]
@@ -19,6 +20,7 @@ export interface GameState {
   currentState: 'selected' | 'moving' | 'update-score' | 'add-balls' | 'new-cycle'
   score: number
   isAnimating: boolean // if ball is shrinking, growing or moving => basically wait till animating is finished before user can do the next step
+  prevBalls: BallState[]
 }
 
 export const DEFAULT_STATE: GameState = {
@@ -27,6 +29,7 @@ export const DEFAULT_STATE: GameState = {
   currentState: 'new-cycle',
   score: 0,
   isAnimating: false,
+  prevBalls: [],
 }
 
 function reduce(state: GameState, action: { payload?: { position?: Position; ball?: BallState; isNewCycle?: boolean }; type: string }): GameState {
@@ -107,10 +110,14 @@ function reduce(state: GameState, action: { payload?: { position?: Position; bal
         }
       })
 
+      // save current ball state for user to undo
+      const prevBalls = state.balls
+
       return {
         ...state,
         balls,
         currentState: 'moving',
+        prevBalls,
       }
     }
 
@@ -152,6 +159,7 @@ function reduce(state: GameState, action: { payload?: { position?: Position; bal
       let balls = state.balls
       let score = state.score
       let currentState = state.currentState
+      let prevBalls = state.prevBalls
 
       const ballsToRemove = findConsecutiveBalls(balls)
 
@@ -172,6 +180,8 @@ function reduce(state: GameState, action: { payload?: { position?: Position; bal
             }
           }
         })
+        //   if user scores then no undo allowed
+        prevBalls = []
       } else if (!payload?.isNewCycle) {
         //   if there's no score to be added and still in cycle => add new balls before going to new cycle
         currentState = 'add-balls'
@@ -183,6 +193,7 @@ function reduce(state: GameState, action: { payload?: { position?: Position; bal
         score,
         currentState,
         isAnimating: ballsToRemove.length > 0,
+        prevBalls,
       }
     }
 
@@ -297,6 +308,16 @@ function reduce(state: GameState, action: { payload?: { position?: Position; bal
       }
     }
 
+    case ACTION_TYPE_UNDO: {
+      if (!state.prevBalls.length) return state
+
+      return {
+        ...DEFAULT_STATE,
+        balls: state.prevBalls,
+        prevBalls: [],
+      }
+    }
+
     default: {
       return state
     }
@@ -349,6 +370,10 @@ const useGameState = (initialState: GameState) => {
     dispatch({ type: ACTION_TYPE_RESTART })
   }, [])
 
+  const undo = useCallback(() => {
+    dispatch({ type: ACTION_TYPE_UNDO })
+  }, [])
+
   const updateScore = useCallback((isNewCycle: boolean) => {
     dispatch({ type: ACTION_TYPE_UPDATE_SCORE, payload: { isNewCycle } })
   }, [])
@@ -368,7 +393,7 @@ const useGameState = (initialState: GameState) => {
     }
   }, [state.currentState, updateScore, addBalls, state.isAnimating])
 
-  return { state, selectBall, selectDestination, bounceSelectedBall, moveSelectedBall, restart, growBalls, shrinkBalls }
+  return { state, selectBall, selectDestination, bounceSelectedBall, moveSelectedBall, restart, growBalls, shrinkBalls, undo }
 }
 
 export default useGameState
