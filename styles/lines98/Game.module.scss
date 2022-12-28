@@ -1,10 +1,4 @@
 .container {
-    @include m.flex-center;
-    flex-direction: column;
-    height: 100%;
-    >div:first-of-type {
-        flex: 1;
-        width: 100%;
-         @include m.flex-center;
-    }
+   @include m.game-container;
+   height: 100%;
 }

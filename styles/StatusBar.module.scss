@@ -6,34 +6,61 @@
     padding: 1.5em 2rem;
 }
 
-.restart {
+.mid {
     @include m.position-center;
-    display: flex;
-    svg {
-        color: v.$yellow;
-        font-size: 2.75rem;
+    @include m.flex-center;
+    gap: 0.3rem;
+    .restart {
+        display: flex;
+        position: relative;
+        svg {
+            color: v.$yellow;
+            font-size: 2.75rem;
+        }
+        &::after {
+            content:'';
+            position: absolute;
+            top: 2.5%;
+            left: 2.5%;
+            width: 95%;
+            height: 95%;
+            background: black;
+            border-radius: 50%;
+            z-index: -1;
+        }
     }
-    &::after {
-        content:'';
-        position: absolute;
-        top: 2.5%;
-        left: 2.5%;
-        width: 95%;
-        height: 95%;
-        background: black;
-        border-radius: 50%;
-        z-index: -1;
+    .undo {
+        display: flex;
+        position: relative;
+        svg {
+            font-size: 2.4rem;
+            color: black;
+        }
+       
+    }
+    &.small .restart svg {
+        font-size: 2rem;
     }
 }
 
+.disabled {
+    opacity: 0.3;
+    pointer-events: none;
+}
+
 .stat {
-    @include m.flex-center;
+    display: flex;
     @include m.game-stat;
     flex-direction: column-reverse;
     gap: 0.1rem;
     font-weight: 700;
     padding: 0 1rem;
     font-size: 1.3rem;
+    flex: 1;
+    text-align: right;
+    &:nth-of-type(1) {
+        text-align: left;
+    }
     > div:nth-of-type(2) {
         font-weight: 700;
         font-size: 1rem;

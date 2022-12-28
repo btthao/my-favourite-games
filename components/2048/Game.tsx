@@ -1,9 +1,5 @@
 import { useEffect } from 'react'
-import useGameState, {
-  DEFAULT_STATE,
-  GameState,
-  TOTAL_COLS,
-} from 'hooks/use2048State'
+import useGameState, { DEFAULT_STATE, GameState, TOTAL_COLS } from 'hooks/use2048State'
 import styles from 'styles/2048/Game.module.scss'
 import Tile from './Tile'
 import { v4 as uuidv4 } from 'uuid'
@@ -23,13 +19,9 @@ const calculateTileSize = (dimension: number) => {
 const DIMENSION = 400
 
 const Game: React.FC<GameProps> = ({ isResizing }) => {
-  const [gameState, setGameState] = useLocalStorage<GameState>(
-    '2048',
-    DEFAULT_STATE
-  )
+  const [gameState, setGameState] = useLocalStorage<GameState>('2048', DEFAULT_STATE)
 
-  const { state, moveDown, moveUp, moveLeft, moveRight, onResize, newGame } =
-    useGameState(gameState)
+  const { state, moveDown, moveUp, moveLeft, moveRight, onResize, newGame } = useGameState(gameState)
   const { activeTiles, gameOver, score, bestScore } = state
 
   useEffect(() => {
@@ -80,7 +72,7 @@ const Game: React.FC<GameProps> = ({ isResizing }) => {
       <StatusBar
         won={false}
         gameOver={gameOver}
-        onClick={newGame}
+        restart={newGame}
         leftComponent={
           <>
             <div>{score}</div>
@@ -95,10 +87,7 @@ const Game: React.FC<GameProps> = ({ isResizing }) => {
         }
       />
       <div className={styles.inner}>
-        <div
-          className={styles.grid}
-          style={{ width: DIMENSION, height: DIMENSION }}
-        >
+        <div className={styles.grid} style={{ width: DIMENSION, height: DIMENSION }}>
           <div className={styles.cells}>
             {new Array(16).fill(0).map((_, idx) => (
               <div key={idx}></div>
@@ -106,12 +95,7 @@ const Game: React.FC<GameProps> = ({ isResizing }) => {
           </div>
           <div className={styles.tiles}>
             {activeTiles.map((tile) => (
-              <Tile
-                key={uuidv4()}
-                {...tile}
-                width={calculateTileSize(DIMENSION)}
-                height={calculateTileSize(DIMENSION)}
-              />
+              <Tile key={uuidv4()} {...tile} width={calculateTileSize(DIMENSION)} height={calculateTileSize(DIMENSION)} />
             ))}
           </div>
         </div>

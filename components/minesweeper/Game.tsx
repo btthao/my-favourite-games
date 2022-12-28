@@ -22,20 +22,23 @@ const Game: React.FC = () => {
       <StatusBar
         gameOver={gameOver}
         won={won}
-        onClick={newGame}
-        leftComponent={<div>{minesCount}</div>}
-        rightComponent={<div>{timer}</div>}
+        restart={newGame}
+        leftComponent={
+          <>
+            <div>{minesCount}</div>
+            <div>Mines</div>
+          </>
+        }
+        rightComponent={
+          <>
+            <div>{timer}</div>
+            <div>Timer</div>
+          </>
+        }
       />
       <div className={styles.grid}>
         {tiles.map((tile, idx) => (
-          <Tile
-            key={idx}
-            index={idx}
-            reveal={reveal}
-            flag={flag}
-            gameOver={gameOver}
-            {...tile}
-          />
+          <Tile key={idx} index={idx} reveal={reveal} flag={flag} gameOver={gameOver} {...tile} />
         ))}
       </div>
     </div>
