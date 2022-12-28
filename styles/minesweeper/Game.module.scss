@@ -1,10 +1,6 @@
 .container {
     @include m.game-container;
     height:100%;
-    >div:first-of-type {
-        padding-top: 2rem;
-        padding-bottom: 2rem;
-    }
 }
 
 .grid {

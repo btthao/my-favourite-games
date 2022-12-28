@@ -7,15 +7,7 @@ const Window = dynamic(() => import('components/Window'), {
 })
 
 const Minesweeper: NextPage = () => {
-  return (
-    <Window
-      minH={480}
-      minW={700}
-      component={Game}
-      title="Minesweeper"
-      disableResize
-    ></Window>
-  )
+  return <Window minH={525} minW={770} component={Game} title="Minesweeper" disableResize></Window>
 }
 
 export default Minesweeper

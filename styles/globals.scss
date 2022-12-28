@@ -31,7 +31,7 @@ button,
 }
 
 .react-resizable-handle {
-    opacity: 0;
+    background-size: 10px;
     transform: none !important;
 }
 
@@ -47,6 +47,6 @@ button,
 }
 
 .disable-resize .react-resizable-handle {
-    opacity: 0;
+    display: none;
     cursor: default;
 }
