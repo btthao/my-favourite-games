@@ -99,7 +99,6 @@ const Game: React.FC<GameProps> = ({ isResizing }) => {
             ))}
           </div>
         </div>
-        {gameOver && <GameOverModal onClick={newGame} />}
       </div>
     </div>
   )

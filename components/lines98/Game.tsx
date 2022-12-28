@@ -1,7 +1,9 @@
+import GameOverModal from 'components/GameOverModal'
 import StatusBar from 'components/StatusBar'
 import useGameState, { DEFAULT_STATE, GameState } from 'hooks/useLines98State'
 import useLocalStorage from 'hooks/useLocalStorage'
 import p5Types from 'p5'
+import { useEffect } from 'react'
 import Sketch from 'react-p5'
 import styles from 'styles/lines98/Game.module.scss'
 import { adjustColor } from 'utils/helpers'
@@ -11,7 +13,7 @@ const Game = () => {
   const [gameState, setGameState] = useLocalStorage<GameState>('lines98', DEFAULT_STATE)
 
   const { moveSelectedBall, selectBall, selectDestination, bounceSelectedBall, state, restart, growBalls, shrinkBalls, undo } = useGameState(gameState)
-  const { balls, score, currentState, isAnimating, prevBalls, gameOver } = state
+  const { balls, score, currentState, isAnimating, prevBalls, gameOver, bestScore } = state
 
   const reorderBalls = () => {
     const activeBalls = []
@@ -71,6 +73,8 @@ const Game = () => {
   }
 
   const mouseClicked = (p5: p5Types) => {
+    if (gameOver) return
+
     const { mouseX, mouseY, floor } = p5
 
     let c = floor((mouseX / DIMENSION) * SIZE)
@@ -82,6 +86,10 @@ const Game = () => {
       selectDestination({ r, c })
     }
   }
+  // save game state
+  useEffect(() => {
+    setGameState(state)
+  }, [state, setGameState])
 
   return (
     <div className={styles.container}>
@@ -99,7 +107,7 @@ const Game = () => {
         }
         rightComponent={
           <>
-            <div>0</div>
+            <div>{bestScore}</div>
             <div>Best</div>
           </>
         }

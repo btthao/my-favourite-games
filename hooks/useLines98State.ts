@@ -21,6 +21,7 @@ export interface GameState {
   score: number
   isAnimating: boolean // if ball is shrinking, growing or moving => basically wait till animating is finished before user can do the next step
   prevBalls: BallState[]
+  bestScore: number
 }
 
 export const DEFAULT_STATE: GameState = {
@@ -30,6 +31,7 @@ export const DEFAULT_STATE: GameState = {
   score: 0,
   isAnimating: false,
   prevBalls: [],
+  bestScore: 0,
 }
 
 function reduce(state: GameState, action: { payload?: { position?: Position; ball?: BallState; isNewCycle?: boolean }; type: string }): GameState {
@@ -160,6 +162,7 @@ function reduce(state: GameState, action: { payload?: { position?: Position; bal
       let score = state.score
       let currentState = state.currentState
       let prevBalls = state.prevBalls
+      let gameOver = state.gameOver
 
       const ballsToRemove = findConsecutiveBalls(balls)
 
@@ -187,6 +190,13 @@ function reduce(state: GameState, action: { payload?: { position?: Position; bal
         currentState = 'add-balls'
       }
 
+      const bestScore = Math.max(score, state.bestScore)
+
+      //   count active balls
+      if (balls.filter((b) => b.isActive).length === SIZE * SIZE) {
+        gameOver = true
+      }
+
       return {
         ...state,
         balls,
@@ -194,6 +204,8 @@ function reduce(state: GameState, action: { payload?: { position?: Position; bal
         currentState,
         isAnimating: ballsToRemove.length > 0,
         prevBalls,
+        bestScore,
+        gameOver,
       }
     }
 
@@ -304,6 +316,7 @@ function reduce(state: GameState, action: { payload?: { position?: Position; bal
     case ACTION_TYPE_RESTART: {
       return {
         ...DEFAULT_STATE,
+        bestScore: state.bestScore,
         balls: getStartingBalls(),
       }
     }
@@ -312,8 +325,10 @@ function reduce(state: GameState, action: { payload?: { position?: Position; bal
       if (!state.prevBalls.length) return state
 
       return {
-        ...DEFAULT_STATE,
-        balls: state.prevBalls,
+        ...state,
+        balls: state.prevBalls.map((b) => {
+          return { ...b, isSelected: false }
+        }),
         prevBalls: [],
       }
     }
