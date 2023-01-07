@@ -38,10 +38,10 @@ const Game = () => {
   }
 
   const draw = (p5: p5Types) => {
-    p5.background('#d6e0e4')
+    p5.background('#F4F4F4')
 
     // draw lines
-    p5.stroke('#a0a3ae')
+    p5.stroke('#868891')
     for (let i = 1; i < SIZE; i++) {
       p5.line((i * DIMENSION) / SIZE, 0, (i * DIMENSION) / SIZE, DIMENSION)
       p5.line(0, (i * DIMENSION) / SIZE, DIMENSION, (i * DIMENSION) / SIZE)

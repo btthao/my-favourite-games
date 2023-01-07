@@ -113,7 +113,10 @@ function reduce(state: GameState, action: { payload?: { position?: Position; bal
       })
 
       // save current ball state for user to undo
-      const prevBalls = state.balls
+      const prevBalls = state.balls.map((ball) => {
+        const { originalX, originalY } = ball.canvasPosition
+        return { ...ball, isSelected: false, canvasPosition: { ...ball.canvasPosition, x: originalX, y: originalY } }
+      })
 
       return {
         ...state,
@@ -326,9 +329,8 @@ function reduce(state: GameState, action: { payload?: { position?: Position; bal
 
       return {
         ...state,
-        balls: state.prevBalls.map((b) => {
-          return { ...b, isSelected: false }
-        }),
+        currentState: 'new-cycle',
+        balls: state.prevBalls,
         prevBalls: [],
       }
     }
