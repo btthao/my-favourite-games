@@ -10,7 +10,7 @@ $theme: '1';
 @mixin tile-color($color) {
   color: $color;
   @if $theme == '1' {
-    background: #dde1e5;
+    background: #F4F4F4;
   } @else {
     background: $dark;
     text-shadow: 0.2em 0.2em 0 rgba(194, 104, 246, 0.15);
@@ -19,8 +19,8 @@ $theme: '1';
 
 @mixin mine-tile-color {
   @if $theme == '1' {
-    background: #d6e0e4d0;
-    border: 0.14em outset lighten($gray, 58%);
+    background: #F4F4F4;
+    border: 0.12em outset lighten($gray, 88%);
     &.revealed {
       background: lighten($gray, 15%);
       border: 0.01em solid lighten($gray, 24%);
@@ -81,7 +81,7 @@ $theme: '1';
   font-size: 0.95rem;
   color: $dark;
   @if $theme == '1' {
-    background: #dbe6ea;
+    background: #DBDADF;
     padding: 0 0.6rem;
     button {
         background: #c3cacc;
@@ -120,13 +120,10 @@ $theme: '1';
 
 @mixin windowbg {
   @if $theme == '1' {
-    background: rgba(238, 238, 238, 0.66);
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
-    border-radius: 0.7rem;
-    filter: brightness(0.85);
-    border: 0.1em solid rgba(255, 255, 255, 0.18);
+    background: #ffffff;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.5);
+    border-radius: 0.5rem;
+    filter:brightness(0.97);
   } @else {
     background: $darkpurple;
     padding: 0 0.4em 0.4rem;
@@ -146,17 +143,17 @@ $theme: '1';
 
 @mixin background {
   @if $theme == '1' {
-    background-color: #63879E;
-    background-image: url('/bg.jpg');
+    background-color: #d6ade0;
+    background: linear-gradient(to top, #6d6db9 0%, #e1add2 100%);
     background-position: left center;
     background-repeat: no-repeat;
     background-position: fixed;
     background-size: cover;
     #folder-back {
-      fill: #16e68c;
+      fill: #578cbb;
     }
     #folder-front {
-      fill: #18cb7e;
+      fill: #6395c2;
     }
   } @else {
     background: $dark;

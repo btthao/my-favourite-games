@@ -6,6 +6,9 @@ body {
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
   color: v.$dark;
   @include m.background;
+  height: 100%;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 
 a {

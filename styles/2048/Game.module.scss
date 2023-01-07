@@ -1,4 +1,4 @@
-$shadow : v.$blueshadow;
+$shadow : rgb(94, 94, 94);
 .container {
    @include m.game-container;
    height: 100%;
