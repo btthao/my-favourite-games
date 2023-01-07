@@ -33,6 +33,10 @@ button,
   position: relative;
 }
 
+.react-resizable {
+    position: fixed !important;
+}
+
 .react-resizable-handle {
     background-size: 10px;
     transform: none !important;
@@ -52,4 +56,26 @@ button,
 .disable-resize .react-resizable-handle {
     display: none;
     cursor: default;
+}
+
+.main-page-folders {
+    position: absolute;
+    top: 7%;
+    left: 1%;
+    display: grid;
+    gap: 7px;
+    .disabled {
+        position: relative;
+        z-index: 1;
+        &::before{
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            z-index: 100;
+        }
+    }
 }
