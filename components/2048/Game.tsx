@@ -2,9 +2,7 @@ import { useEffect } from 'react'
 import useGameState, { DEFAULT_STATE, GameState, TOTAL_COLS } from 'hooks/use2048State'
 import styles from 'styles/2048/Game.module.scss'
 import Tile from './Tile'
-import { v4 as uuidv4 } from 'uuid'
 import { TILE_GAP_2048 } from '../../constants'
-import GameOverModal from 'components/GameOverModal'
 import useLocalStorage from 'hooks/useLocalStorage'
 import StatusBar from 'components/StatusBar'
 
@@ -18,10 +16,10 @@ const calculateTileSize = (dimension: number) => {
 
 const DIMENSION = 400
 
-const Game: React.FC<GameProps> = ({ isResizing }) => {
+const Game: React.FC<GameProps> = () => {
   const [gameState, setGameState] = useLocalStorage<GameState>('2048', DEFAULT_STATE)
 
-  const { state, moveDown, moveUp, moveLeft, moveRight, onResize, newGame } = useGameState(gameState)
+  const { state, moveDown, moveUp, moveLeft, moveRight, newGame } = useGameState(gameState)
   const { activeTiles, gameOver, score, bestScore } = state
 
   useEffect(() => {
@@ -58,12 +56,6 @@ const Game: React.FC<GameProps> = ({ isResizing }) => {
   }, [moveDown, moveLeft, moveRight, moveUp, gameOver])
 
   useEffect(() => {
-    if (isResizing) {
-      onResize()
-    }
-  }, [isResizing, onResize])
-
-  useEffect(() => {
     setGameState(state)
   }, [activeTiles, gameOver, score, bestScore, state, setGameState])
 
@@ -95,7 +87,7 @@ const Game: React.FC<GameProps> = ({ isResizing }) => {
           </div>
           <div className={styles.tiles}>
             {activeTiles.map((tile) => (
-              <Tile key={uuidv4()} {...tile} width={calculateTileSize(DIMENSION)} height={calculateTileSize(DIMENSION)} />
+              <Tile key={JSON.stringify(tile)} {...tile} width={calculateTileSize(DIMENSION)} height={calculateTileSize(DIMENSION)} />
             ))}
           </div>
         </div>

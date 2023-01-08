@@ -1,9 +1,10 @@
-import { SyntheticEvent, useState } from 'react'
+import { SyntheticEvent, useContext, useState } from 'react'
 import Draggable, { ControlPosition, DraggableEventHandler } from 'react-draggable'
 import { IoCloseSharp } from 'react-icons/io5'
 import { Resizable, ResizeCallbackData } from 'react-resizable'
 import styles from 'styles/Window.module.scss'
 import 'react-resizable/css/styles.css'
+import { WindowZIndexContext } from 'pages'
 
 interface WindowProps {
   component: React.ComponentType<any>
@@ -20,7 +21,9 @@ type WindowSizeAndPosition = {
 }
 
 const Window: React.FC<WindowProps> = ({ component: Component, title, minHeight, minWidth, disableResize = false }) => {
+  const { currentHighestZIndex, setCurrentHighestZIndex } = useContext(WindowZIndexContext)
   const [open, setOpen] = useState(false)
+  const [zIndex, setZIndex] = useState(50)
 
   const defaultState: WindowSizeAndPosition = {
     height: minHeight,
@@ -32,10 +35,15 @@ const Window: React.FC<WindowProps> = ({ component: Component, title, minHeight,
   }
 
   const [{ height, position, width }, setWindowSizeAndPosition] = useState(defaultState)
-  const [isResizing, setIsResizing] = useState(false)
+
+  const moveWindowForward = () => {
+    setZIndex(currentHighestZIndex + 1)
+    setCurrentHighestZIndex((prev) => prev + 1)
+  }
 
   const onOpen = () => {
     setOpen(true)
+    moveWindowForward()
   }
   const onClose = () => {
     setOpen(false)
@@ -46,14 +54,12 @@ const Window: React.FC<WindowProps> = ({ component: Component, title, minHeight,
     setWindowSizeAndPosition((prev) => {
       return { ...prev, height: size.height, width: size.width }
     })
-    setIsResizing(true)
   }
 
   const onDrag: DraggableEventHandler = (_event, { x, y }) => {
     setWindowSizeAndPosition((prev) => {
       return { ...prev, position: { x, y } }
     })
-    setIsResizing(true)
   }
 
   return (
@@ -63,13 +69,15 @@ const Window: React.FC<WindowProps> = ({ component: Component, title, minHeight,
         <p>{title}</p>
       </div>
       {open && (
-        <Draggable handle=".drag-handle" bounds="body" onDrag={onDrag} position={position} onStop={() => setIsResizing(false)}>
-          <Resizable width={width} height={height} onResize={onResize} onResizeStop={() => setIsResizing(false)} minConstraints={[minWidth, minHeight]} maxConstraints={[window.innerWidth, window.innerHeight]} resizeHandles={['se', 'e', 's']}>
+        <Draggable handle=".drag-handle" bounds="body" onDrag={onDrag} position={position}>
+          <Resizable width={width} height={height} onResize={onResize} minConstraints={[minWidth, minHeight]} maxConstraints={[window.innerWidth, window.innerHeight]} resizeHandles={['se', 'e', 's']}>
             <div
               className={styles.window + (disableResize ? ' disable-resize' : '')}
+              onClick={moveWindowForward}
               style={{
                 width: width,
                 height: height,
+                zIndex,
               }}
             >
               <div className={styles['title-bar'] + ' drag-handle'}>
@@ -81,7 +89,7 @@ const Window: React.FC<WindowProps> = ({ component: Component, title, minHeight,
                 </div>
               </div>
               <div className={styles.inner}>
-                <Component isResizing={isResizing} />
+                <Component />
               </div>
             </div>
           </Resizable>
