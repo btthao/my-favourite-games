@@ -1,33 +1,25 @@
-import produce from 'immer'
-import {
-  BasicTile,
-  getAllEmptyTilesPositions,
-  getAllTilesPositions,
-  getMultipleRandomEmptyTiles,
-  getRandomEmptyTilePosition,
-  Position,
-  putTilesInBoard,
-} from './tile'
+import { BasicTile, getAllEmptyTilePositions, getAllTilePositions, getMultipleRandomEmptyTiles, getRandomTilePositionFromList, TilePosition, putTilesInBoard } from './tile'
 
 export interface TileState extends BasicTile {
   value: number
   isNew?: boolean
   isMerged?: boolean
   toBeRemoved?: boolean
-  prevPosition?: Position | null
+  prevPosition?: TilePosition | null
   animationDelay?: number | null
 }
 
-export type ActiveTilesState = TileState[]
+export type ActiveTiles = TileState[]
 
 // constants
 export const TOTAL_ROWS = 4
 export const TOTAL_COLS = 4
 export const TILE_ANIMATION_DELAY = 70
-export const ALL_TILES_POS = getAllTilesPositions(TOTAL_ROWS, TOTAL_COLS)
+export const TILE_GAP = 2
+export const ALL_TILES_POS = getAllTilePositions(TOTAL_ROWS, TOTAL_COLS)
 
 // helper functions
-export const getStartingActiveTiles = (): ActiveTilesState => {
+export const getStartingTiles = (): ActiveTiles => {
   const tiles = getMultipleRandomEmptyTiles(ALL_TILES_POS, 2)
 
   return tiles.map((tile) => {
@@ -35,11 +27,7 @@ export const getStartingActiveTiles = (): ActiveTilesState => {
   })
 }
 
-export const makeTilesBoard = (
-  row: number,
-  col: number,
-  activeTiles: ActiveTilesState
-): TileState[][] => {
+export const makeTilesBoard = (activeTiles: ActiveTiles): TileState[][] => {
   const callback = (tile: TileState) => {
     return !tile.toBeRemoved
   }
@@ -51,17 +39,12 @@ export const makeTilesBoard = (
     animationDelay: null,
   }
 
-  return putTilesInBoard<TileState>(
-    row,
-    col,
-    activeTiles,
-    callback,
-    resetTileState
-  )
+  return putTilesInBoard<TileState>(TOTAL_ROWS, TOTAL_COLS, activeTiles, callback, resetTileState)
 }
 
-export const isGameOver = (activeTiles: ActiveTilesState): boolean => {
-  let board = makeTilesBoard(TOTAL_ROWS, TOTAL_COLS, activeTiles)
+export const isGameOver = (activeTiles: ActiveTiles): boolean => {
+  let board = makeTilesBoard(activeTiles)
+
   for (let r = 0; r < TOTAL_ROWS; r++) {
     for (let c = 0; c < TOTAL_COLS; c++) {
       if (!board[r][c]) return false
@@ -76,79 +59,38 @@ export const isGameOver = (activeTiles: ActiveTilesState): boolean => {
   return true
 }
 
-export const updateGameState = ({
-  tilesMoved,
-  activeTiles,
-}: {
-  tilesMoved: boolean
-  activeTiles: ActiveTilesState
-}) => {
-  // add new tile if game not over, return gameover state
-  if (tilesMoved) {
-    const emptyTiles = getAllEmptyTilesPositions(activeTiles, ALL_TILES_POS)
-    if (emptyTiles.length) {
-      activeTiles = [
-        ...activeTiles,
-        {
-          isNew: true,
-          value: 2,
-          position: getRandomEmptyTilePosition(emptyTiles),
-        },
-      ]
+export const addNewTileToActiveTilesList = (activeTiles: ActiveTiles) => {
+  const emptyTiles = getAllEmptyTilePositions(activeTiles, ALL_TILES_POS)
+  const hasEmptyTile = emptyTiles.length > 0
+
+  if (hasEmptyTile) {
+    const newTile = {
+      isNew: true,
+      value: 2,
+      position: getRandomTilePositionFromList(emptyTiles),
     }
+    activeTiles = [...activeTiles, newTile]
   }
 
-  return { activeTiles, gameOver: isGameOver(activeTiles) }
+  return activeTiles
 }
 
-export const mergeTiles = ({
-  tiles,
-  position,
-  idx,
-  mergedValue,
-  animationDelay,
-}: {
-  tiles: TileState[]
-  position: Position
-  idx: number
-  mergedValue: number
-  animationDelay: number
-}): TileState[] => {
-  // delay merge animation until tile has reached new position
-  tiles = produce(tiles, (draft) => {
-    let count = 0
-    while (++count <= 2) {
-      draft[idx] = {
-        ...draft[idx],
-        prevPosition: { ...draft[idx].position },
-        position,
-        toBeRemoved: true,
-      }
-      idx--
-    }
-    draft.push({
-      value: mergedValue,
-      isMerged: true,
-      position,
-      animationDelay,
-    })
-  })
-
-  return tiles
+export const updateTilePosition = (tile: TileState, newPosition: TilePosition) => {
+  return {
+    ...tile,
+    prevPosition: { ...tile.position },
+    position: newPosition,
+  }
 }
 
-// only show active tiles during resize event => prevent transition
-// if from previous game in localstorage => show pop in animation for all tiles
-export const filterActiveTiles = (
-  activeTiles: ActiveTilesState,
-  fromPreviousGame: boolean
-): TileState[] => {
-  let newActiveTiles: TileState[] = []
+export const filterTilesForNewSession = (activeTiles: ActiveTiles) => {
+  let newActiveTiles: ActiveTiles = []
+
   for (const tile of activeTiles) {
     if (tile.toBeRemoved) continue
     newActiveTiles.push({
       ...tile,
-      isNew: fromPreviousGame,
+      isNew: true,
       isMerged: false,
       prevPosition: null,
       animationDelay: null,

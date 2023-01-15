@@ -1,57 +1,46 @@
 import produce from 'immer'
 import { selectRandomFromList } from './helpers'
 
-export type Position = {
+export type TilePosition = {
   r: number
   c: number
 }
 
 export interface BasicTile {
-  position: Position
+  position: TilePosition
 }
 
-export const getAllTilesPositions = (row: number, col: number): Position[] => {
-  let tiles: Position[] = []
+export const getAllTilePositions = (row: number, col: number): TilePosition[] => {
+  let positions: TilePosition[] = []
 
   for (let r = 0; r < row; r++) {
     for (let c = 0; c < col; c++) {
-      tiles.push({ r, c })
+      positions.push({ r, c })
     }
   }
 
-  return tiles
+  return positions
 }
 
-export const getRandomEmptyTilePosition = (
-  emptyTiles: Position[]
-): Position => {
-  return selectRandomFromList(emptyTiles)
+export const getRandomTilePositionFromList = (positions: TilePosition[]): TilePosition => {
+  return selectRandomFromList(positions)
 }
 
-export const getAllEmptyTilesPositions = (
-  activeTiles: BasicTile[],
-  allTiles: Position[]
-): Position[] => {
-  let emptyTiles = allTiles
+export const getAllEmptyTilePositions = (activeTiles: BasicTile[], allPositions: TilePosition[]): TilePosition[] => {
+  let emptyTilePositions = allPositions
 
   for (const tile of activeTiles) {
-    emptyTiles = emptyTiles.filter(
-      (currTile) =>
-        currTile.c !== tile.position.c || currTile.r !== tile.position.r
-    )
+    emptyTilePositions = emptyTilePositions.filter((currTile) => currTile.c !== tile.position.c || currTile.r !== tile.position.r)
   }
 
-  return emptyTiles
+  return emptyTilePositions
 }
 
-export const getMultipleRandomEmptyTiles = (
-  emptyTiles: Position[],
-  number: number
-): BasicTile[] => {
+export const getMultipleRandomEmptyTiles = (emptyTiles: TilePosition[], numberOfTilesWanted: number): BasicTile[] => {
   let output: BasicTile[] = []
 
-  while (output.length < number) {
-    const { r, c } = getRandomEmptyTilePosition(emptyTiles)
+  while (output.length < numberOfTilesWanted) {
+    const { r, c } = getRandomTilePositionFromList(emptyTiles)
     emptyTiles = emptyTiles.filter((tile) => tile.c !== c || tile.r !== r)
     output.push({
       position: { r, c },
@@ -61,13 +50,7 @@ export const getMultipleRandomEmptyTiles = (
   return output
 }
 
-export const putTilesInBoard = <T extends BasicTile>(
-  row: number,
-  col: number,
-  tiles: T[],
-  callback?: (tile: T) => boolean,
-  overwriteProps?: Partial<T>
-): T[][] => {
+export const putTilesInBoard = <T extends BasicTile>(row: number, col: number, tiles: T[], callback?: (tile: T) => boolean, defaultTileProps?: Partial<T>): T[][] => {
   let board: T[][] = new Array(row).fill(new Array(col).fill(null))
 
   board = produce<T[][], T[][]>(board, (draft) => {
@@ -77,7 +60,7 @@ export const putTilesInBoard = <T extends BasicTile>(
       const { r, c } = tile.position
       draft[r][c] = {
         ...tile,
-        ...overwriteProps,
+        ...defaultTileProps,
       }
     }
   })
@@ -85,26 +68,16 @@ export const putTilesInBoard = <T extends BasicTile>(
   return board
 }
 
-export const checkClickOnActiveTile = <T extends BasicTile>(
-  position: Position,
-  activeTiles: T[],
-  callback: (tile: T) => boolean = () => {
-    return true
-  }
-) => {
-  let idx = -1
+export const findActiveTileAtClickedPosition = <T extends BasicTile>(clickedPos: TilePosition, activeTiles: T[], callback: (tile: T) => boolean) => {
+  let clickedTileIdx = -1
 
   const clickedTile = activeTiles.filter((tile, i) => {
-    if (
-      tile.position.c == position.c &&
-      tile.position.r == position.r &&
-      callback(tile)
-    ) {
-      idx = i
+    if (tile.position.c == clickedPos.c && tile.position.r == clickedPos.r && callback(tile)) {
+      clickedTileIdx = i
       return true
     }
     return false
   })
 
-  return { idx, clickedTile: clickedTile.length ? clickedTile[0] : null }
+  return { clickedTileIdx, clickedTile: clickedTile.length ? clickedTile[0] : null }
 }

@@ -1,26 +1,19 @@
 import { useEffect } from 'react'
-import useGameState, { DEFAULT_STATE, GameState, TOTAL_COLS } from 'hooks/use2048State'
+import useGameState, { DEFAULT_GAME_STATE, GameState } from 'hooks/use2048State'
 import styles from 'styles/2048/Game.module.scss'
 import Tile from './Tile'
-import { TILE_GAP_2048 } from '../../constants'
 import useLocalStorage from 'hooks/useLocalStorage'
 import StatusBar from 'components/StatusBar'
+import { TILE_GAP, TOTAL_COLS } from 'utils/2048'
 
-interface GameProps {
-  isResizing: boolean
-}
+const GRID_SIZE = 400
+const TILE_SIZE = (GRID_SIZE - TILE_GAP * (TOTAL_COLS + 1)) / TOTAL_COLS
 
-const calculateTileSize = (dimension: number) => {
-  return (dimension - TILE_GAP_2048 * (TOTAL_COLS + 1)) / TOTAL_COLS
-}
+const Game: React.FC = () => {
+  const [localStorage, setLocalStorage] = useLocalStorage<GameState>('2048', DEFAULT_GAME_STATE)
 
-const DIMENSION = 400
-
-const Game: React.FC<GameProps> = () => {
-  const [gameState, setGameState] = useLocalStorage<GameState>('2048', DEFAULT_STATE)
-
-  const { state, moveDown, moveUp, moveLeft, moveRight, newGame } = useGameState(gameState)
-  const { activeTiles, gameOver, score, bestScore } = state
+  const { state, moveDown, moveUp, moveLeft, moveRight, newGame } = useGameState(localStorage)
+  const { activeTiles, gameOver, score, bestScore, moveCount } = state
 
   useEffect(() => {
     const handleKeyDown = (event: any) => {
@@ -56,13 +49,12 @@ const Game: React.FC<GameProps> = () => {
   }, [moveDown, moveLeft, moveRight, moveUp, gameOver])
 
   useEffect(() => {
-    setGameState(state)
-  }, [activeTiles, gameOver, score, bestScore, state, setGameState])
+    setLocalStorage(state)
+  }, [activeTiles, gameOver, score, bestScore, state, setLocalStorage])
 
   return (
     <div className={styles.container}>
       <StatusBar
-        won={false}
         gameOver={gameOver}
         restart={newGame}
         leftComponent={
@@ -79,7 +71,7 @@ const Game: React.FC<GameProps> = () => {
         }
       />
       <div className={styles.inner}>
-        <div className={styles.grid} style={{ width: DIMENSION, height: DIMENSION }}>
+        <div className={styles.grid} style={{ width: GRID_SIZE, height: GRID_SIZE }}>
           <div className={styles.cells}>
             {new Array(16).fill(0).map((_, idx) => (
               <div key={idx}></div>
@@ -87,7 +79,7 @@ const Game: React.FC<GameProps> = () => {
           </div>
           <div className={styles.tiles}>
             {activeTiles.map((tile) => (
-              <Tile key={JSON.stringify(tile)} {...tile} width={calculateTileSize(DIMENSION)} height={calculateTileSize(DIMENSION)} />
+              <Tile key={JSON.stringify(tile) + moveCount} {...tile} width={TILE_SIZE} height={TILE_SIZE} />
             ))}
           </div>
         </div>

@@ -9,10 +9,10 @@ export const partition = <T>(array: T[], callback: (element: T, index: number, a
   )
 }
 
-export const selectRandomFromList = <T>(options: T[]): T => {
-  return options[Math.floor(Math.random() * options.length)]
+export const selectRandomFromList = <T>(list: T[]): T => {
+  return list[Math.floor(Math.random() * list.length)]
 }
 
-export const adjustColor = (color: string, amount: number) => {
+export const adjustColorIntensity= (color: string, amount: number) => {
   return '#' + color.replace(/^#/, '').replace(/../g, (color) => ('0' + Math.min(255, Math.max(0, parseInt(color, 16) + amount)).toString(16)).slice(-2))
 }

@@ -1,402 +1,216 @@
 import { useCallback, useReducer } from 'react'
-import {
-  ActiveTilesState,
-  getStartingActiveTiles,
-  makeTilesBoard,
-  mergeTiles,
-  TileState,
-  TILE_ANIMATION_DELAY,
-  TOTAL_COLS,
-  TOTAL_ROWS,
-  updateGameState,
-  filterActiveTiles,
-} from 'utils/2048'
+import { ActiveTiles, getStartingTiles, makeTilesBoard, TileState, TILE_ANIMATION_DELAY, TOTAL_COLS, TOTAL_ROWS, addNewTileToActiveTilesList, isGameOver, filterTilesForNewSession, updateTilePosition } from 'utils/2048'
 
-const ACTION_TYPE_MOVE_DOWN = 'move-down'
-const ACTION_TYPE_MOVE_LEFT = 'move-left'
-const ACTION_TYPE_MOVE_RIGHT = 'move-right'
-const ACTION_TYPE_MOVE_UP = 'move-up'
-const ACTION_TYPE_RESIZE_EVENT = 'resize'
+const ACTION_TYPE_MOVE_VERTICAL = 'move-vertical'
+const ACTION_TYPE_MOVE_HORIZONTAL = 'move-horizontal'
 const ACTION_TYPE_NEW_GAME = 'new-game'
+const DIRECTION_UP = 'up'
+const DIRECTION_DOWN = 'down'
+const DIRECTION_RIGHT = 'right'
+const DIRECTION_LEFT = 'left'
 
 export interface GameState {
-  activeTiles: ActiveTilesState
+  activeTiles: ActiveTiles
   score: number
   bestScore: number
   gameOver: boolean
+  moveCount: number
 }
 
-export const DEFAULT_STATE: GameState = {
+export const DEFAULT_GAME_STATE: GameState = {
   activeTiles: [],
   score: 0,
   bestScore: 0,
   gameOver: false,
+  moveCount: 0,
 }
 
-function reduce(
-  state: GameState,
-  action: { payload?: any; type: string }
-): GameState {
-  const { type } = action
+function reduce(state: GameState, action: { payload?: string; type: string }): GameState {
+  const { type, payload } = action
 
   switch (type) {
-    case ACTION_TYPE_MOVE_DOWN: {
-      const { activeTiles } = state
-      if (!activeTiles.length) return state
+    case ACTION_TYPE_MOVE_VERTICAL: {
+      if (!state.activeTiles.length) return state
 
-      let tilesMoved = false
+      let moveUp = payload == DIRECTION_UP
+
+      let needNewTile = false
       let score = state.score
-      let newActiveTiles: ActiveTilesState = []
+      let newActiveTiles: ActiveTiles = []
 
-      //   put active tiles in a board
-      let board = makeTilesBoard(TOTAL_ROWS, TOTAL_COLS, activeTiles)
+      let board = makeTilesBoard(state.activeTiles)
 
-      // move down => for each column, merge from bottom
       for (let col = 0; col < TOTAL_COLS; col++) {
         let tilesInCol: TileState[] = []
 
-        //   get active tiles in column
         for (let row = 0; row < TOTAL_ROWS; row++) {
           if (board[row][col]) {
             tilesInCol.push(board[row][col])
           }
         }
 
-        //   fill column from bottom
-        let i = tilesInCol.length - 1
-        let currentRow = TOTAL_ROWS - 1
-
-        while (i > -1 && currentRow > -1) {
-          let position = { r: currentRow, c: col }
-
-          if (i > 0 && tilesInCol[i].value == tilesInCol[i - 1]?.value) {
-            //  change position of 2 tiles to be merged
-            tilesMoved = true
-
-            //   animation delay: wait till old tiles moved to new position
-            let mergedTileAnimationDelay =
-              Math.abs(tilesInCol[i - 1].position.r - currentRow) *
-              TILE_ANIMATION_DELAY
-
-            const mergedValue = tilesInCol[i].value * 2
-
-            tilesInCol = [
-              ...mergeTiles({
-                tiles: tilesInCol,
-                position,
-                idx: i,
-                mergedValue,
-                animationDelay: mergedTileAnimationDelay,
-              }),
-            ]
-
-            score += mergedValue
-
-            i--
-          } else {
-            if (!tilesMoved) {
-              tilesMoved = tilesInCol[i].position.r != currentRow
-            }
-
-            tilesInCol[i] = {
-              ...tilesInCol[i],
-              prevPosition: { ...tilesInCol[i].position },
-              position,
-            }
-          }
-
-          currentRow--
-          i--
+        if (moveUp) {
+          tilesInCol.reverse()
         }
 
-        newActiveTiles = [...newActiveTiles, ...tilesInCol]
+        let currentRow = moveUp ? 0 : TOTAL_ROWS - 1
+
+        for (let i = tilesInCol.length - 1; i >= 0; i--) {
+          if (currentRow < 0 || currentRow >= TOTAL_ROWS) break
+
+          const currentPosition = { r: currentRow, c: col }
+
+          const currentTileMatchAdjacentTile: boolean = i > 0 && tilesInCol[i].value == tilesInCol[i - 1]?.value
+
+          const tileMovesToNewPosition: boolean = tilesInCol[i].position.r != currentRow
+
+          if (tileMovesToNewPosition || currentTileMatchAdjacentTile) {
+            needNewTile = true
+          }
+
+          if (currentTileMatchAdjacentTile) {
+            const mergedTileValue = tilesInCol[i].value * 2
+            const adjacentTileRow = tilesInCol[i - 1].position.r
+
+            tilesInCol[i] = { ...updateTilePosition(tilesInCol[i], currentPosition), toBeRemoved: true }
+            tilesInCol[i - 1] = { ...updateTilePosition(tilesInCol[i - 1], currentPosition), toBeRemoved: true }
+
+            const newTileWithMergedValue = {
+              value: mergedTileValue,
+              isMerged: true,
+              position: currentPosition,
+              animationDelay: Math.abs(adjacentTileRow - currentRow) * TILE_ANIMATION_DELAY,
+            }
+
+            tilesInCol.push(newTileWithMergedValue)
+
+            score += mergedTileValue
+
+            // skip adjacent tile
+            i--
+          } else {
+            tilesInCol[i] = updateTilePosition(tilesInCol[i], currentPosition)
+          }
+
+          if (moveUp) {
+            currentRow++
+          } else {
+            currentRow--
+          }
+        }
+
+        newActiveTiles.push(...tilesInCol)
       }
 
-      const { activeTiles: updatedActiveTiles, gameOver } = updateGameState({
-        tilesMoved,
-        activeTiles: newActiveTiles,
-      })
+      if (needNewTile) {
+        newActiveTiles = addNewTileToActiveTilesList(newActiveTiles)
+      }
+
+      const gameOver = isGameOver(newActiveTiles)
 
       return {
         ...state,
-        activeTiles: updatedActiveTiles,
         gameOver,
         score,
-        bestScore: Math.max(score, state.bestScore),
-      }
-    }
-
-    case ACTION_TYPE_MOVE_UP: {
-      const { activeTiles } = state
-      if (!activeTiles.length) return state
-
-      let tilesMoved = false
-      let score = state.score
-      let newActiveTiles: ActiveTilesState = []
-
-      //   put active tiles in a board
-      let board = makeTilesBoard(TOTAL_ROWS, TOTAL_COLS, activeTiles)
-
-      // move up => for each column, merge from top
-      for (let col = 0; col < TOTAL_COLS; col++) {
-        let tilesInCol: TileState[] = []
-
-        //   get active tiles in column
-        for (let row = TOTAL_ROWS - 1; row > -1; row--) {
-          if (board[row][col]) {
-            tilesInCol.push(board[row][col])
-          }
-        }
-
-        //   fill column from top
-        let i = tilesInCol.length - 1
-        let currentRow = 0
-
-        while (i > -1 && currentRow < TOTAL_ROWS) {
-          let position = { r: currentRow, c: col }
-
-          if (i > 0 && tilesInCol[i].value == tilesInCol[i - 1]?.value) {
-            //  change position of 2 tiles to be merged
-            tilesMoved = true
-
-            //   animation delay: wait till old tiles moved to new position
-            let mergedTileAnimationDelay =
-              Math.abs(tilesInCol[i - 1].position.r - currentRow) *
-              TILE_ANIMATION_DELAY
-
-            const mergedValue = tilesInCol[i].value * 2
-
-            tilesInCol = [
-              ...mergeTiles({
-                tiles: tilesInCol,
-                position,
-                idx: i,
-                mergedValue,
-                animationDelay: mergedTileAnimationDelay,
-              }),
-            ]
-            score += mergedValue
-
-            i--
-          } else {
-            if (!tilesMoved) {
-              tilesMoved = tilesInCol[i].position.r != currentRow
-            }
-
-            tilesInCol[i] = {
-              ...tilesInCol[i],
-              prevPosition: { ...tilesInCol[i].position },
-              position,
-            }
-          }
-
-          currentRow++
-          i--
-        }
-
-        newActiveTiles = [...newActiveTiles, ...tilesInCol]
-      }
-
-      const { activeTiles: updatedActiveTiles, gameOver } = updateGameState({
-        tilesMoved,
         activeTiles: newActiveTiles,
-      })
-
-      return {
-        ...state,
-        activeTiles: updatedActiveTiles,
-        gameOver,
-        score,
         bestScore: Math.max(score, state.bestScore),
+        moveCount: state.moveCount + 1,
       }
     }
 
-    case ACTION_TYPE_MOVE_RIGHT: {
-      const { activeTiles } = state
-      if (!activeTiles.length) return state
+    case ACTION_TYPE_MOVE_HORIZONTAL: {
+      if (!state.activeTiles.length) return state
 
-      let tilesMoved = false
+      let moveLeft = payload == DIRECTION_LEFT
+
+      let needNewTile = false
       let score = state.score
-      let newActiveTiles: ActiveTilesState = []
+      let newActiveTiles: ActiveTiles = []
 
-      //   put active tiles in a board
-      let board = makeTilesBoard(TOTAL_ROWS, TOTAL_COLS, activeTiles)
+      let board = makeTilesBoard(state.activeTiles)
 
-      // move right => for each row, merge from right
       for (let row = 0; row < TOTAL_ROWS; row++) {
         let tilesInRow: TileState[] = []
 
-        //   get active tiles in row
         for (let col = 0; col < TOTAL_COLS; col++) {
           if (board[row][col]) {
             tilesInRow.push(board[row][col])
           }
         }
 
-        //   fill row from right
-        let i = tilesInRow.length - 1
-        let currentCol = TOTAL_COLS - 1
+        if (moveLeft) {
+          tilesInRow.reverse()
+        }
 
-        while (i > -1 && currentCol > -1) {
-          let position = { r: row, c: currentCol }
+        let currentCol = moveLeft ? 0 : TOTAL_COLS - 1
 
-          if (i > 0 && tilesInRow[i].value == tilesInRow[i - 1]?.value) {
-            //  change position of 2 tiles to be merged
-            tilesMoved = true
+        for (let i = tilesInRow.length - 1; i >= 0; i--) {
+          if (currentCol < 0 || currentCol >= TOTAL_COLS) break
 
-            //   animation delay: wait till old tiles moved to new position
-            let mergedTileAnimationDelay =
-              Math.abs(tilesInRow[i - 1].position.c - currentCol) *
-              TILE_ANIMATION_DELAY
+          const currentPosition = { r: row, c: currentCol }
 
-            const mergedValue = tilesInRow[i].value * 2
+          const currentTileMatchAdjacentTile: boolean = i > 0 && tilesInRow[i].value == tilesInRow[i - 1]?.value
 
-            tilesInRow = [
-              ...mergeTiles({
-                tiles: tilesInRow,
-                position,
-                idx: i,
-                mergedValue,
-                animationDelay: mergedTileAnimationDelay,
-              }),
-            ]
+          const tileMovesToNewPosition: boolean = tilesInRow[i].position.c != currentCol
 
-            score += mergedValue
+          if (tileMovesToNewPosition || currentTileMatchAdjacentTile) {
+            needNewTile = true
+          }
 
+          if (currentTileMatchAdjacentTile) {
+            const mergedTileValue = tilesInRow[i].value * 2
+            const adjacentTileCol = tilesInRow[i - 1].position.c
+
+            tilesInRow[i] = { ...updateTilePosition(tilesInRow[i], currentPosition), toBeRemoved: true }
+            tilesInRow[i - 1] = { ...updateTilePosition(tilesInRow[i - 1], currentPosition), toBeRemoved: true }
+
+            const newTileWithMergedValue = {
+              value: mergedTileValue,
+              isMerged: true,
+              position: currentPosition,
+              animationDelay: Math.abs(adjacentTileCol - currentCol) * TILE_ANIMATION_DELAY,
+            }
+
+            tilesInRow.push(newTileWithMergedValue)
+
+            score += mergedTileValue
+
+            // skip adjacent tile
             i--
           } else {
-            if (!tilesMoved) {
-              tilesMoved = tilesInRow[i].position.c != currentCol
-            }
-
-            tilesInRow[i] = {
-              ...tilesInRow[i],
-              prevPosition: { ...tilesInRow[i].position },
-              position,
-            }
+            tilesInRow[i] = updateTilePosition(tilesInRow[i], currentPosition)
           }
 
-          currentCol--
-          i--
-        }
-
-        newActiveTiles = [...newActiveTiles, ...tilesInRow]
-      }
-
-      const { activeTiles: updatedActiveTiles, gameOver } = updateGameState({
-        tilesMoved,
-        activeTiles: newActiveTiles,
-      })
-
-      return {
-        ...state,
-        activeTiles: updatedActiveTiles,
-        gameOver,
-        score,
-        bestScore: Math.max(score, state.bestScore),
-      }
-    }
-
-    case ACTION_TYPE_MOVE_LEFT: {
-      const { activeTiles } = state
-      if (!activeTiles.length) return state
-
-      let tilesMoved = false
-      let score = state.score
-      let newActiveTiles: ActiveTilesState = []
-
-      //   put active tiles in a board
-      let board = makeTilesBoard(TOTAL_ROWS, TOTAL_COLS, activeTiles)
-
-      // move left => for each row, merge from left
-      for (let row = 0; row < TOTAL_ROWS; row++) {
-        let tilesInRow: TileState[] = []
-
-        //   get active tiles in row
-        for (let col = TOTAL_COLS - 1; col > -1; col--) {
-          if (board[row][col]) {
-            tilesInRow.push(board[row][col])
-          }
-        }
-
-        //   fill row from left
-        let i = tilesInRow.length - 1
-        let currentCol = 0
-
-        while (i > -1 && currentCol < TOTAL_COLS) {
-          let position = { r: row, c: currentCol }
-
-          if (i > 0 && tilesInRow[i].value == tilesInRow[i - 1]?.value) {
-            //  change position of 2 tiles to be merged
-            tilesMoved = true
-
-            //   animation delay: wait till old tiles moved to new position
-            let mergedTileAnimationDelay =
-              Math.abs(tilesInRow[i - 1].position.c - currentCol) *
-              TILE_ANIMATION_DELAY
-
-            const mergedValue = tilesInRow[i].value * 2
-
-            tilesInRow = [
-              ...mergeTiles({
-                tiles: tilesInRow,
-                position,
-                idx: i,
-                mergedValue,
-                animationDelay: mergedTileAnimationDelay,
-              }),
-            ]
-
-            score += mergedValue
-
-            i--
+          if (moveLeft) {
+            currentCol++
           } else {
-            if (!tilesMoved) {
-              tilesMoved = tilesInRow[i].position.c != currentCol
-            }
-
-            tilesInRow[i] = {
-              ...tilesInRow[i],
-              prevPosition: { ...tilesInRow[i].position },
-              position,
-            }
+            currentCol--
           }
-
-          currentCol++
-          i--
         }
 
-        newActiveTiles = [...newActiveTiles, ...tilesInRow]
+        newActiveTiles.push(...tilesInRow)
       }
 
-      const { activeTiles: updatedActiveTiles, gameOver } = updateGameState({
-        tilesMoved,
-        activeTiles: newActiveTiles,
-      })
+      if (needNewTile) {
+        newActiveTiles = addNewTileToActiveTilesList(newActiveTiles)
+      }
+
+      const gameOver = isGameOver(newActiveTiles)
 
       return {
         ...state,
-        activeTiles: updatedActiveTiles,
         gameOver,
         score,
+        activeTiles: newActiveTiles,
         bestScore: Math.max(score, state.bestScore),
-      }
-    }
-
-    case ACTION_TYPE_RESIZE_EVENT: {
-      const { activeTiles } = state
-      if (!activeTiles.length) return state
-
-      return {
-        ...state,
-        activeTiles: filterActiveTiles(activeTiles, false),
+        moveCount: state.moveCount + 1,
       }
     }
 
     case ACTION_TYPE_NEW_GAME: {
       return {
-        ...DEFAULT_STATE,
-        activeTiles: getStartingActiveTiles(),
+        ...DEFAULT_GAME_STATE,
+        activeTiles: getStartingTiles(),
         bestScore: state.bestScore,
       }
     }
@@ -409,51 +223,41 @@ function reduce(
 
 const useGameState = (initialState: GameState) => {
   const [state, dispatch] = useReducer(reduce, null, () => {
-    const { activeTiles, gameOver, score } = initialState
-    if (activeTiles?.length) {
+    const { activeTiles, gameOver, bestScore } = initialState
+    if (activeTiles?.length && !gameOver) {
       return {
         ...initialState,
-        activeTiles: gameOver
-          ? getStartingActiveTiles()
-          : filterActiveTiles(initialState.activeTiles, true),
-        score: gameOver ? 0 : score,
-        gameOver: false,
+        activeTiles: filterTilesForNewSession(activeTiles),
       }
-    } else {
-      return {
-        ...DEFAULT_STATE,
-        activeTiles: getStartingActiveTiles(),
-      }
+    }
+    return {
+      ...DEFAULT_GAME_STATE,
+      activeTiles: getStartingTiles(),
+      bestScore,
     }
   })
 
   const moveDown = useCallback(() => {
-    dispatch({ type: ACTION_TYPE_MOVE_DOWN })
+    dispatch({ type: ACTION_TYPE_MOVE_VERTICAL, payload: DIRECTION_DOWN })
   }, [])
 
   const moveUp = useCallback(() => {
-    dispatch({ type: ACTION_TYPE_MOVE_UP })
+    dispatch({ type: ACTION_TYPE_MOVE_VERTICAL, payload: DIRECTION_UP })
   }, [])
 
   const moveRight = useCallback(() => {
-    dispatch({ type: ACTION_TYPE_MOVE_RIGHT })
+    dispatch({ type: ACTION_TYPE_MOVE_HORIZONTAL, payload: DIRECTION_RIGHT })
   }, [])
 
   const moveLeft = useCallback(() => {
-    dispatch({ type: ACTION_TYPE_MOVE_LEFT })
-  }, [])
-
-  const onResize = useCallback(() => {
-    dispatch({ type: ACTION_TYPE_RESIZE_EVENT })
+    dispatch({ type: ACTION_TYPE_MOVE_HORIZONTAL, payload: DIRECTION_LEFT })
   }, [])
 
   const newGame = useCallback(() => {
     dispatch({ type: ACTION_TYPE_NEW_GAME })
   }, [])
 
-  return { state, moveDown, moveLeft, moveUp, moveRight, onResize, newGame }
+  return { state, moveDown, moveLeft, moveUp, moveRight, newGame }
 }
-
-export { TILE_ANIMATION_DELAY, TOTAL_COLS }
 
 export default useGameState
