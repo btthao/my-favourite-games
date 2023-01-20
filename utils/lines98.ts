@@ -1,5 +1,5 @@
 import { selectRandomFromList } from './helpers'
-import { BasicTile, checkClickOnActiveTile, getAllTilesPositions, getMultipleRandomEmptyTiles, Position, putTilesInBoard } from './tile'
+import { BasicTile, getAllTilePositions, getMultipleRandomEmptyTiles, putTilesInBoard, TilePosition } from './tile'
 
 export const colors = ['#19b05f', '#9a62e3', '#2fadcc', '#e636a8', '#9D2D18', '#F6D102']
 export type BallColor = typeof colors[number]
@@ -27,7 +27,7 @@ export interface BallState extends BasicTile {
 
 // to find optimal path
 interface PathNode {
-  position: Position
+  position: TilePosition
   f: number // cost from start to finish through this node, f = g+h
   g: number // cost from start to this node
   h: number // cost from this node to end
@@ -39,7 +39,7 @@ interface PathNode {
 // Constants
 export const DIMENSION = 495
 export const SIZE = 9
-export const ALL_TILES_POS = getAllTilesPositions(SIZE, SIZE)
+export const ALL_TILES_POS = getAllTilePositions(SIZE, SIZE)
 export const BALL_BOUNCE_SPEED = 0.25
 export const BIG_BALL_SIZE = DIMENSION / (1.45 * SIZE)
 export const SMALL_BALL_SIZE = DIMENSION / (4 * SIZE)
@@ -54,7 +54,7 @@ export const getStartingBalls = (): BallState[] => {
   })
 }
 
-export const createBall = (position: Position, isActive: boolean, defaultValue?: Partial<BallState>): BallState => {
+export const createBall = (position: TilePosition, isActive: boolean, defaultValue?: Partial<BallState>): BallState => {
   const { x, y } = getCanvasPosition(position)
   return {
     position,
@@ -83,12 +83,7 @@ export const getBallSize = (isActive: boolean) => {
   return isActive ? BIG_BALL_SIZE : SMALL_BALL_SIZE
 }
 
-export const isClickOnActiveBall = (position: Position, balls: BallState[]) => {
-  const { clickedTile } = checkClickOnActiveTile(position, balls, (ball: BallState) => ball.isActive)
-  return clickedTile !== null
-}
-
-export const getCanvasPosition = (position: Position) => {
+export const getCanvasPosition = (position: TilePosition) => {
   return { x: ((position.c + 0.5) * DIMENSION) / SIZE, y: ((position.r + 0.5) * DIMENSION) / SIZE }
 }
 
@@ -99,7 +94,7 @@ export const findConsecutiveBalls = (balls: BallState[]) => {
     balls.filter((b) => b.isActive)
   )
 
-  let ballsToRemove: Position[] = []
+  let ballsToRemove: TilePosition[] = []
 
   for (let r = 0; r < SIZE; r++) {
     for (let c = 0; c < SIZE; c++) {
@@ -108,9 +103,9 @@ export const findConsecutiveBalls = (balls: BallState[]) => {
       //   only check active balls
       const currentColor = board[r][c].color
 
-      let ballsOfSameColor: Position[] = [board[r][c].position]
+      let ballsOfSameColor: TilePosition[] = [board[r][c].position]
 
-      let counts: Record<string, { n: number; ballsPositions: Position[] }> = {
+      let counts: Record<string, { n: number; ballsPositions: TilePosition[] }> = {
         horizontal: {
           n: 1,
           ballsPositions: [],
@@ -179,12 +174,12 @@ export const findConsecutiveBalls = (balls: BallState[]) => {
 }
 
 // path finding astar algo
-const dist = (a: Position, b: Position) => {
+const dist = (a: TilePosition, b: TilePosition) => {
   let d = Math.abs(a.c - b.c) + Math.abs(a.r - b.r)
   return d
 }
 
-const addNeighbors = ({ c, r }: Position, board: PathNode[][]) => {
+const addNeighbors = ({ c, r }: TilePosition, board: PathNode[][]) => {
   const neighbors = []
 
   if (r < SIZE - 1) {
@@ -204,7 +199,7 @@ const addNeighbors = ({ c, r }: Position, board: PathNode[][]) => {
 }
 
 // use this if want ball to move slower by adding extra points between every 2 nodes in path
-export const transformPath = (path: Position[]) => {
+export const transformPath = (path: TilePosition[]) => {
   //   transforming node position to position in canvas for animation effect
   if (!path.length) return []
 
@@ -241,12 +236,12 @@ export const transformPath = (path: Position[]) => {
   return updatedPath
 }
 
-export const findPath = (balls: BallState[], start: Position, end: Position) => {
+export const findPath = (balls: BallState[], start: TilePosition, end: TilePosition) => {
   let openSet: PathNode[] = []
   let closedSet: PathNode[] = []
 
   let board: PathNode[][] = []
-  let path: Position[] = []
+  let path: TilePosition[] = []
   let current: PathNode | undefined
 
   // initialize board
@@ -323,4 +318,14 @@ export const findPath = (balls: BallState[], start: Position, end: Position) => 
 
   // convert row and col to actual position in canvas
   return path.map((p) => getCanvasPosition(p))
+}
+
+export const clickedOnActiveBall = (clickedPos: TilePosition, activeBalls: BallState[]) => {
+  for (const ball of activeBalls) {
+    if (ball.position.c == clickedPos.c && ball.position.r == clickedPos.r && ball.isActive) {
+      return true
+    }
+  }
+
+  return false
 }
