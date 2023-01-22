@@ -67,17 +67,3 @@ export const putTilesInBoard = <T extends BasicTile>(row: number, col: number, t
 
   return board
 }
-
-export const findActiveTileAtClickedPosition = <T extends BasicTile>(clickedPos: TilePosition, activeTiles: T[], callback: (tile: T) => boolean) => {
-  let clickedTileIdx = -1
-
-  const clickedTile = activeTiles.filter((tile, i) => {
-    if (tile.position.c == clickedPos.c && tile.position.r == clickedPos.r && callback(tile)) {
-      clickedTileIdx = i
-      return true
-    }
-    return false
-  })
-
-  return { clickedTileIdx, clickedTile: clickedTile.length ? clickedTile[0] : null }
-}

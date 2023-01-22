@@ -4,10 +4,7 @@ import styles from 'styles/2048/Game.module.scss'
 import Tile from './Tile'
 import useLocalStorage from 'hooks/useLocalStorage'
 import StatusBar from 'components/StatusBar'
-import { TILE_GAP, TOTAL_COLS } from 'utils/2048'
-
-const GRID_SIZE = 400
-const TILE_SIZE = (GRID_SIZE - TILE_GAP * (TOTAL_COLS + 1)) / TOTAL_COLS
+import { GRID_SIZE, TILE_SIZE } from 'utils/2048'
 
 const Game: React.FC = () => {
   const [localStorage, setLocalStorage] = useLocalStorage<GameState>('2048', DEFAULT_GAME_STATE)

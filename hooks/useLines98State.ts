@@ -1,6 +1,7 @@
 import produce from 'immer'
 import { useCallback, useEffect, useReducer } from 'react'
-import { ALL_TILES_POS, BallState, BALL_BOUNCE_SPEED, findConsecutiveBalls, createBall, DIMENSION, getCanvasPosition, getStartingBalls, SIZE, getBallSize, findPath } from 'utils/lines98'
+import { findPath } from 'utils/astarPathSearch'
+import { ALL_TILES_POS, BallState, BALL_BOUNCE_SPEED, findConsecutiveBalls, createBall, DIMENSION, getCanvasPosition, getStartingBalls, TILES_PER_SIDE, getBallSize, cancelAnimationFromPreviousSession } from 'utils/lines98'
 import { getAllEmptyTilePositions, getMultipleRandomEmptyTiles, TilePosition } from 'utils/tile'
 
 const ACTION_TYPE_SELECT_BALL = 'select-ball'
@@ -14,12 +15,14 @@ const ACTION_TYPE_SHRINK_BALLS = 'shrink-balls'
 const ACTION_TYPE_RESTART = 'restart'
 const ACTION_TYPE_UNDO = 'undo'
 
+type CurrentStage = 'selected' | 'moving' | 'update-score' | 'add-balls' | 'new-cycle'
+
 export interface GameState {
   balls: BallState[]
   gameOver: boolean
-  currentStage: 'selected' | 'moving' | 'update-score' | 'add-balls' | 'new-cycle'
+  currentStage: CurrentStage
   score: number
-  isAnimating: boolean // if ball is shrinking, growing or moving => basically wait till animating is finished before user can do the next step
+  isAnimating: boolean // if ball is shrinking, growing or moving => wait till animation finishes before user can do the next step
   prevBalls: BallState[]
   bestScore: number
 }
@@ -34,17 +37,18 @@ export const DEFAULT_GAME_STATE: GameState = {
   bestScore: 0,
 }
 
-function reduce(state: GameState, action: { payload?: { position?: TilePosition; ball?: BallState; isNewCycle?: boolean }; type: string }): GameState {
+function reduce(state: GameState, action: { payload?: { position?: TilePosition }; type: string }): GameState {
   const { type, payload } = action
 
   switch (type) {
     case ACTION_TYPE_SELECT_BALL: {
       if (!payload?.position || state.currentStage == 'moving' || state.isAnimating) return state
+
       const { r, c } = payload.position
 
       const balls = produce(state.balls, (draft) => {
         for (let i = 0; i < draft.length; i++) {
-          // deselect previously selected ball
+          // deselect previously selected ball if any
           if (draft[i].isSelected) {
             draft[i].canvasPosition.x = draft[i].canvasPosition.originalX
             draft[i].canvasPosition.y = draft[i].canvasPosition.originalY
@@ -67,17 +71,16 @@ function reduce(state: GameState, action: { payload?: { position?: TilePosition;
     case ACTION_TYPE_BOUNCE_BALL: {
       if (state.currentStage !== 'selected') return state
 
-      let balls = state.balls
-
-      balls = produce(balls, (draft) => {
+      const balls = produce(state.balls, (draft) => {
         for (let i = 0; i < draft.length; i++) {
           if (draft[i].isSelected) {
             const { canvasPosition, movingDirection } = draft[i]
-            //   change position
+
             draft[i].canvasPosition.y = canvasPosition.y + BALL_BOUNCE_SPEED * movingDirection.y
 
-            //  change direction when going out of tile border
-            if (Math.abs(canvasPosition.originalY - canvasPosition.y) >= (DIMENSION * 0.1) / SIZE) {
+            const ballIsOutOfTileBorder = Math.abs(canvasPosition.originalY - canvasPosition.y) >= (DIMENSION * 0.1) / TILES_PER_SIDE
+
+            if (ballIsOutOfTileBorder) {
               draft[i].movingDirection.y = movingDirection.y == 1 ? -1 : 1
             }
           }
@@ -93,26 +96,29 @@ function reduce(state: GameState, action: { payload?: { position?: TilePosition;
     case ACTION_TYPE_SELECT_DESTINATION: {
       if (!payload?.position || state.currentStage !== 'selected' || state.isAnimating) return state
 
-      const path = findPath(state.balls, state.balls.filter((b) => b.isSelected)[0].position, payload.position)
-      //   if there's no possible path to destination, stop here
+      const start: TilePosition = state.balls.filter((b) => b.isSelected)[0].position
+      const destination: TilePosition = payload.position
+
+      const path = findPath(state.balls, start, destination)
+
       if (!path.length) return state
 
-      const { x, y } = getCanvasPosition(payload.position)
+      const { x, y } = getCanvasPosition(destination)
 
       const balls = produce(state.balls, (draft) => {
         for (let i = 0; i < draft.length; i++) {
           if (draft[i].isSelected) {
             const { originalX, originalY } = draft[i].canvasPosition
-            //   set new position on canvas, set originalPosition as destination but current is the old one
+
             draft[i].isMoving = true
-            draft[i].position = payload.position as TilePosition
+            draft[i].position = destination
             draft[i].canvasPosition = { x: originalX, y: originalY, originalX: x, originalY: y }
             draft[i].movingPath = path
           }
         }
       })
 
-      // save current ball state for user to undo
+      // save current ball state for user to undo later
       const prevBalls = state.balls.map((ball) => {
         const { originalX, originalY } = ball.canvasPosition
         return { ...ball, isSelected: false, canvasPosition: { ...ball.canvasPosition, x: originalX, y: originalY } }
@@ -129,24 +135,21 @@ function reduce(state: GameState, action: { payload?: { position?: TilePosition;
     case ACTION_TYPE_MOVE_BALL: {
       if (state.currentStage !== 'moving') return state
 
-      let balls = state.balls
-      let currentStage = state.currentStage
+      let currentStage: CurrentStage = state.currentStage
 
-      balls = produce(balls, (draft) => {
+      const balls = produce(state.balls, (draft) => {
         for (let i = 0; i < draft.length; i++) {
           if (draft[i].isMoving) {
-            //   change position to the next node we already set in movingPath
             const nextPos = draft[i].movingPath?.pop()
 
             if (!nextPos) {
               // have arrived at destination
               draft[i].isSelected = false
               draft[i].isMoving = false
-              // @ts-ignore
               currentStage = 'update-score'
               break
             }
-            //  update position
+
             draft[i].canvasPosition.y = nextPos.y
             draft[i].canvasPosition.x = nextPos.x
           }
@@ -162,78 +165,67 @@ function reduce(state: GameState, action: { payload?: { position?: TilePosition;
 
     case ACTION_TYPE_UPDATE_SCORE: {
       let balls = state.balls
-      let score = state.score
       let currentStage = state.currentStage
       let prevBalls = state.prevBalls
-      let gameOver = state.gameOver
 
-      const ballsToRemove = findConsecutiveBalls(balls)
+      const consecutiveBalls = findConsecutiveBalls(balls)
+      const scoreToAdd = Object.keys(consecutiveBalls).length
 
-      if (ballsToRemove.length) {
-        //   if there's score to be added => go to new cycle to skip add balls
+      if (scoreToAdd) {
+        //   if user scores, go to new cycle, skip adding new balls and disallow undo
         currentStage = 'new-cycle'
+        prevBalls = []
 
-        //   prepare balls to be shrunk
         balls = produce(balls, (draft) => {
           for (let i = 0; i < draft.length; i++) {
             if (!draft[i].isActive) continue
-            for (const b of ballsToRemove) {
-              if (draft[i].position.c === b.c && draft[i].position.r === b.r) {
-                draft[i].toBeRemoved = true
-                score += 1
-                break
-              }
+
+            const positionStr = draft[i].position.c + '-' + draft[i].position.r
+            if (positionStr in consecutiveBalls) {
+              draft[i].toBeRemoved = true
             }
           }
         })
-        //   if user scores then no undo allowed
-        prevBalls = []
-      } else if (!payload?.isNewCycle) {
-        //   if there's no score to be added and still in cycle => add new balls before going to new cycle
-        currentStage = 'add-balls'
       }
 
-      const bestScore = Math.max(score, state.bestScore)
-
-      //   count active balls
-      if (balls.filter((b) => b.isActive).length === SIZE * SIZE) {
-        gameOver = true
+      if (currentStage == 'update-score') {
+        currentStage = 'add-balls'
       }
 
       return {
         ...state,
         balls,
-        score,
         currentStage,
-        isAnimating: ballsToRemove.length > 0,
         prevBalls,
-        bestScore,
-        gameOver,
+        score: state.score + scoreToAdd,
+        gameOver: balls.filter((b) => b.isActive && !b.toBeRemoved).length === TILES_PER_SIDE * TILES_PER_SIDE,
+        isAnimating: scoreToAdd > 0,
+        bestScore: Math.max(state.score + scoreToAdd, state.bestScore),
       }
     }
 
     case ACTION_TYPE_ADD_BALLS: {
       let balls = state.balls
-      let isAnimating = state.isAnimating
 
       const activeBalls = balls.filter((ball) => ball.isActive)
 
       let newBallsNeeded = 3
+
       //   if there's an inactive ball same tile with active ball
-      let removedIdx = -1
+      let removedInactiveBallIdx = -1
 
       balls = produce(balls, (draft) => {
         for (let i = 0; i < draft.length; i++) {
           if (!draft[i].isActive) {
-            // => small balls get bigger
             draft[i].isActive = true
             draft[i].isGrowing = true
-            isAnimating = true
+
             for (const b of activeBalls) {
-              // => small ball in same tile with big ball => move somewhere else
-              if (draft[i].position.c === b.position.c && draft[i].position.r === b.position.r) {
+              const twoBallsInOneTile: boolean = draft[i].position.c === b.position.c && draft[i].position.r === b.position.r
+
+              if (twoBallsInOneTile) {
                 newBallsNeeded += 1
-                removedIdx = i
+                removedInactiveBallIdx = i
                 break
               }
             }
@@ -241,25 +233,24 @@ function reduce(state: GameState, action: { payload?: { position?: TilePosition;
         }
       })
 
-      //   remove inactive ball first before adding its replacement
-      if (removedIdx >= 0) {
-        balls = balls.filter((ball, idx) => idx !== removedIdx)
+      if (removedInactiveBallIdx >= 0) {
+        balls = balls.filter((_b, idx) => idx !== removedInactiveBallIdx)
       }
 
-      // => add new inactive balls plus replacement ball if any
-      const emptyTiles = getAllEmptyTilePositions(balls, ALL_TILES_POS)
-      const newPositions = getMultipleRandomEmptyTiles(emptyTiles, Math.min(newBallsNeeded, emptyTiles.length))
+      const availablePositions = getAllEmptyTilePositions(balls, ALL_TILES_POS)
+      const newBallsPositions = getMultipleRandomEmptyTiles(availablePositions, Math.min(newBallsNeeded, availablePositions.length))
 
-      for (let i = 0; i < newPositions.length; i++) {
+      for (let i = 0; i < newBallsPositions.length; i++) {
         const isReplacementBall = newBallsNeeded > 3 && i == 0
-        balls = [...balls, createBall(newPositions[i].position, isReplacementBall, { isGrowing: isReplacementBall, size: getBallSize(false) })]
+        const newBall = createBall(newBallsPositions[i].position, isReplacementBall, { isGrowing: isReplacementBall, size: getBallSize(false) })
+        balls = [newBall, ...balls]
       }
 
       return {
         ...state,
         balls,
         currentStage: 'new-cycle',
-        isAnimating,
+        isAnimating: true,
       }
     }
 
@@ -270,8 +261,10 @@ function reduce(state: GameState, action: { payload?: { position?: TilePosition;
         for (let i = 0; i < draft.length; i++) {
           if (draft[i].isGrowing) {
             const { size } = draft[i]
-            // if ball size is big enough, stop
-            if (Math.abs(size - getBallSize(true)) <= 2) {
+
+            const ballGrownEnough = Math.abs(size - getBallSize(true)) <= 2
+
+            if (ballGrownEnough) {
               draft[i].size = getBallSize(true)
               draft[i].isGrowing = false
               isAnimating = false
@@ -294,13 +287,12 @@ function reduce(state: GameState, action: { payload?: { position?: TilePosition;
 
       let balls = produce(state.balls, (draft) => {
         for (let i = 0; i < draft.length; i++) {
-          if (draft[i].toBeRemoved === true) {
+          if (draft[i].toBeRemoved) {
             draft[i].size -= 2
           }
         }
       })
 
-      //   if size < 0 => remove now
       balls = balls.filter((ball) => {
         if (ball.size <= 0) {
           isAnimating = false
@@ -319,8 +311,8 @@ function reduce(state: GameState, action: { payload?: { position?: TilePosition;
     case ACTION_TYPE_RESTART: {
       return {
         ...DEFAULT_GAME_STATE,
-        bestScore: state.bestScore,
         balls: getStartingBalls(),
+        bestScore: state.bestScore,
       }
     }
 
@@ -343,19 +335,22 @@ function reduce(state: GameState, action: { payload?: { position?: TilePosition;
 
 const useGameState = (initialState: GameState) => {
   const [state, dispatch] = useReducer(reduce, null, () => {
-    const { balls, gameOver, score } = initialState
-    if (balls.length) {
+    const { balls, gameOver, bestScore } = initialState
+
+    if (balls.length && !gameOver) {
       return {
         ...initialState,
-        balls: gameOver ? getStartingBalls() : balls,
-        gameOver: false,
-        score: gameOver ? 0 : score,
+        balls: cancelAnimationFromPreviousSession(balls),
+        currentStage: 'new-cycle' as CurrentStage,
+        isAnimating: false,
+        prevBalls: [],
       }
-    } else {
-      return {
-        ...DEFAULT_GAME_STATE,
-        balls: getStartingBalls(),
-      }
+    }
+
+    return {
+      ...DEFAULT_GAME_STATE,
+      balls: getStartingBalls(),
+      bestScore,
     }
   })
 
@@ -391,8 +386,8 @@ const useGameState = (initialState: GameState) => {
     dispatch({ type: ACTION_TYPE_UNDO })
   }, [])
 
-  const updateScore = useCallback((isNewCycle: boolean) => {
-    dispatch({ type: ACTION_TYPE_UPDATE_SCORE, payload: { isNewCycle } })
+  const updateScore = useCallback(() => {
+    dispatch({ type: ACTION_TYPE_UPDATE_SCORE })
   }, [])
 
   const addBalls = useCallback(() => {
@@ -400,12 +395,13 @@ const useGameState = (initialState: GameState) => {
   }, [])
 
   useEffect(() => {
-    //   update score after new balls grow or selected ball moved to its destination
-    if ((state.currentStage == 'update-score' || state.currentStage == 'new-cycle') && !state.isAnimating) {
-      updateScore(state.currentStage === 'new-cycle')
+    if (state.isAnimating) return
+
+    if (state.currentStage == 'update-score' || state.currentStage == 'new-cycle') {
+      updateScore()
     }
 
-    if (state.currentStage == 'add-balls' && !state.isAnimating) {
+    if (state.currentStage == 'add-balls') {
       addBalls()
     }
   }, [state.currentStage, updateScore, addBalls, state.isAnimating])
@@ -414,40 +410,3 @@ const useGameState = (initialState: GameState) => {
 }
 
 export default useGameState
-
-// start: 7 big, 3 small
-
-// check if click on empty or active ball in canvas
-
-// const ACTION_TYPE_SELECT_BALL = 'select'
-// click on active ball => change state to selected
-
-// const ACTION_TYPE_BOUNCE_ANIMATION = 'bounce-animation'
-// while draw, if ball state is active => bouncing animation
-
-// const ACTION_TYPE_MOVE_SELECTED_BALL = 'move'
-// click empty or inactive ball
-// => if there's bouncing ball: move ball if there's possible path => change position
-
-// const ACTION_TYPE_MOVE_ANIMATION = 'moving-animation'
-
-// const ACTION_TYPE_CHECK_SCORE = 'check-score'
-// after move: check score
-
-// const ACTION_TYPE_NEW_CYCLE = 'new-cycle'
-// if not score
-// => small ball same possible with big ball => inactive ball move somewhere else
-// => small balls get bigger
-// => new small balls appear => check for score again
-
-// if score
-// => balls disappear
-// => small balls stay the same, no new balls
-
-// BUG: SMALL BALL MOVED TO NEW PLACE EVEN WHEN SCORE
-// WAIT TILL GROW TO COUNT SCORE
-// move on small ball => score => small ball disappear
-
-// get ballsize function => make object
-
-// move => check score => add

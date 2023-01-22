@@ -13,6 +13,7 @@ $shadow : rgb(94, 94, 94);
   position: relative;
   border: 2px solid $shadow;
   display: grid;
+  overflow: hidden;
 }
 
 

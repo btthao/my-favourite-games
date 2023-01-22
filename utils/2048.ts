@@ -17,6 +17,8 @@ export const TOTAL_COLS = 4
 export const TILE_ANIMATION_DELAY = 70
 export const TILE_GAP = 2
 export const ALL_TILES_POS = getAllTilePositions(TOTAL_ROWS, TOTAL_COLS)
+export const GRID_SIZE = 400
+export const TILE_SIZE = (GRID_SIZE - TILE_GAP * (TOTAL_COLS + 1)) / TOTAL_COLS
 
 // helper functions
 export const getStartingTiles = (): ActiveTiles => {

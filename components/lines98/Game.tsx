@@ -6,7 +6,7 @@ import { useEffect } from 'react'
 import Sketch from 'react-p5'
 import styles from 'styles/lines98/Game.module.scss'
 import { adjustColorIntensity } from 'utils/helpers'
-import { clickedOnActiveBall, DIMENSION, SIZE } from 'utils/lines98'
+import { clickedOnActiveBall, DIMENSION, TILES_PER_SIDE } from 'utils/lines98'
 
 const Game = () => {
   const [localStorage, setLocalStorage] = useLocalStorage<GameState>('lines98', DEFAULT_GAME_STATE)
@@ -23,9 +23,9 @@ const Game = () => {
 
     // draw lines
     p5.stroke('#868891')
-    for (let i = 1; i < SIZE; i++) {
-      p5.line((i * DIMENSION) / SIZE, 0, (i * DIMENSION) / SIZE, DIMENSION)
-      p5.line(0, (i * DIMENSION) / SIZE, DIMENSION, (i * DIMENSION) / SIZE)
+    for (let i = 1; i < TILES_PER_SIDE; i++) {
+      p5.line((i * DIMENSION) / TILES_PER_SIDE, 0, (i * DIMENSION) / TILES_PER_SIDE, DIMENSION)
+      p5.line(0, (i * DIMENSION) / TILES_PER_SIDE, DIMENSION, (i * DIMENSION) / TILES_PER_SIDE)
     }
 
     // draw balls
@@ -58,17 +58,22 @@ const Game = () => {
 
     const { mouseX, mouseY, floor } = p5
 
-    let c = floor((mouseX / DIMENSION) * SIZE)
-    let r = floor((mouseY / DIMENSION) * SIZE)
+    const clickedOutsideSketch = mouseX <= 0 || mouseY <= 0 || mouseX >= DIMENSION || mouseY >= DIMENSION
+
+    if (clickedOutsideSketch) return
+
+    let c = floor((mouseX / DIMENSION) * TILES_PER_SIDE)
+    let r = floor((mouseY / DIMENSION) * TILES_PER_SIDE)
 
     if (clickedOnActiveBall({ r, c }, balls)) {
       selectBall({ r, c })
-    } else if (r >= 0 && c >= 0) {
+    } else {
       selectDestination({ r, c })
     }
   }
 
   useEffect(() => {
+    if (state.currentStage !== 'new-cycle') return
     setLocalStorage(state)
   }, [setLocalStorage, state])
 

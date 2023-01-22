@@ -29,8 +29,8 @@ const Window: React.FC<WindowProps> = ({ component: Component, title, minHeight,
     height: minHeight,
     width: minWidth,
     position: {
-      x: (window.innerWidth - minWidth) / 2,
-      y: (window.innerHeight - minHeight) / 2,
+      x: (window.innerWidth - minWidth) / 3,
+      y: window.innerHeight - minHeight - 88,
     },
   }
 

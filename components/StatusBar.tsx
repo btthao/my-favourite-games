@@ -7,12 +7,12 @@ interface StatusBarProps {
   undo?: () => void
   disableUndo?: boolean
   gameOver: boolean
-  won: boolean
+  won?: boolean
   leftComponent: JSX.Element
   rightComponent: JSX.Element
 }
 
-const StatusBar: React.FC<StatusBarProps> = ({ undo, restart, won, gameOver, leftComponent, rightComponent, disableUndo = false }) => {
+const StatusBar: React.FC<StatusBarProps> = ({ undo, restart, won = false, gameOver, leftComponent, rightComponent, disableUndo = false }) => {
   return (
     <div className={styles['status-bar']}>
       <div className={styles.stat}>{leftComponent}</div>
