@@ -1,7 +1,7 @@
 import Game from 'components/minesweeper/Game'
 import dynamic from 'next/dynamic'
 
-const Window = dynamic(() => import('components/Window'), {
+const Window = dynamic(() => import('components/window/Window'), {
   ssr: false,
 })
 

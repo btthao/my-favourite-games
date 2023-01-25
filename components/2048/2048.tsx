@@ -1,7 +1,7 @@
 import dynamic from 'next/dynamic'
 import Game from 'components/2048/Game'
 
-const Window = dynamic(() => import('components/Window'), {
+const Window = dynamic(() => import('components/window/Window'), {
   ssr: false,
 })
 

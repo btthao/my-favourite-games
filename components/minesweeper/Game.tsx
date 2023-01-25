@@ -1,5 +1,5 @@
-import Confetti from 'components/Confetti'
-import StatusBar from 'components/StatusBar'
+import Confetti from 'components/miscellaneous/Confetti'
+import StatusBar from 'components/window/StatusBar'
 import useGameState from 'hooks/useMinesweeperState'
 import styles from 'styles/minesweeper/Game.module.scss'
 import Tile from './Tile'

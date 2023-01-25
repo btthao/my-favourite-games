@@ -3,7 +3,7 @@ import useGameState, { DEFAULT_GAME_STATE, GameState } from 'hooks/use2048State'
 import styles from 'styles/2048/Game.module.scss'
 import Tile from './Tile'
 import useLocalStorage from 'hooks/useLocalStorage'
-import StatusBar from 'components/StatusBar'
+import StatusBar from 'components/window/StatusBar'
 import { GRID_SIZE, TILE_SIZE } from 'utils/2048'
 
 const Game: React.FC = () => {

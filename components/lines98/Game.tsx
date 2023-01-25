@@ -1,4 +1,4 @@
-import StatusBar from 'components/StatusBar'
+import StatusBar from 'components/window/StatusBar'
 import useGameState, { DEFAULT_GAME_STATE, GameState } from 'hooks/useLines98State'
 import useLocalStorage from 'hooks/useLocalStorage'
 import p5Types from 'p5'
