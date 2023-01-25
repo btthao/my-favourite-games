@@ -1,4 +1,5 @@
 import produce from 'immer'
+import { shuffleArray } from './helpers'
 
 export const TOTAL_ROWS = 16
 export const TOTAL_COLS = 30
@@ -21,19 +22,17 @@ export const DEFAULT_TILE_STATE = {
 }
 
 export const initMinesweeper = (tiles: TileState[], clickedTileIdx: number) => {
-  //   random 99 mines excluding clicked tile and its surrounding tiles
-  const mines = createMines(clickedTileIdx)
+  const minesIndexes = createMines(clickedTileIdx)
 
   tiles = produce(tiles, (draft) => {
-    for (const mine of mines) {
+    for (const mine of minesIndexes) {
       draft[mine].hasMine = true
     }
 
     // calculate surrounding mines
     for (let i = 0; i < draft.length; i++) {
       let surroundingMines = 0
-      const { hasTop, hasBottom, hasLeft, hasRight } =
-        checkPossibleSurroundingTiles(i)
+      const { hasTop, hasBottom, hasLeft, hasRight } = checkPossibleSurroundingTiles(i)
 
       //   top
       if (hasTop && draft[i - TOTAL_COLS].hasMine) {
@@ -75,10 +74,7 @@ export const initMinesweeper = (tiles: TileState[], clickedTileIdx: number) => {
   return expandMineFreeArea(tiles, clickedTileIdx)
 }
 
-export const expandMineFreeArea = (
-  tiles: TileState[],
-  clickedTileIdx: number
-) => {
+export const expandMineFreeArea = (tiles: TileState[], clickedTileIdx: number) => {
   let tilesToBeRevealed: Set<number> | number[] = new Set()
   let stack: number[] = [clickedTileIdx]
 
@@ -91,8 +87,7 @@ export const expandMineFreeArea = (
 
     if (tiles[i].surroundingMines > 0) continue
 
-    const { hasTop, hasBottom, hasLeft, hasRight } =
-      checkPossibleSurroundingTiles(i)
+    const { hasTop, hasBottom, hasLeft, hasRight } = checkPossibleSurroundingTiles(i)
 
     //   top
     if (hasTop && tileCanBeRevealed(tiles[i - TOTAL_COLS])) {
@@ -141,31 +136,25 @@ export const expandMineFreeArea = (
   })
 }
 
-const shuffleArray = (array: any[]) => {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    const temp = array[i]
-    array[i] = array[j]
-    array[j] = temp
-  }
+export const revealAllMines = (tiles: TileState[], clickedTileIdx: number) => {
+  return produce(tiles, (draft) => {
+    for (let i = 0; i < draft.length; i++) {
+      if (draft[i].hasMine) {
+        draft[i].isRevealed = true
+      }
+      draft[clickedTileIdx].isClickedMine = true
+    }
+  })
 }
 
-const createMines = (i: number) => {
+const createMines = (i: number): number[] => {
   let mines = Array.from(Array(TOTAL_COLS * TOTAL_ROWS).keys())
 
   // exclude clicked tile and its surrounding tiles then shuffle
-  const excludedTiles = [
-    i,
-    i - 1,
-    i + 1,
-    i - TOTAL_COLS,
-    i - TOTAL_COLS - 1,
-    i - TOTAL_COLS + 1,
-    i + TOTAL_COLS,
-    i + TOTAL_COLS - 1,
-    i + TOTAL_COLS + 1,
-  ]
+  const excludedTiles = [i, i - 1, i + 1, i - TOTAL_COLS, i - TOTAL_COLS - 1, i - TOTAL_COLS + 1, i + TOTAL_COLS, i + TOTAL_COLS - 1, i + TOTAL_COLS + 1]
+
   mines = mines.filter((x) => excludedTiles.indexOf(x) < 0)
+
   shuffleArray(mines)
 
   // the first 99 tiles would be mines

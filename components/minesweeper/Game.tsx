@@ -1,20 +1,12 @@
 import Confetti from 'components/Confetti'
 import StatusBar from 'components/StatusBar'
 import useGameState from 'hooks/useMinesweeperState'
-import { useEffect } from 'react'
 import styles from 'styles/minesweeper/Game.module.scss'
 import Tile from './Tile'
 
 const Game: React.FC = () => {
-  const { state, newGame, reveal, flag, setTimer } = useGameState()
+  const { state, newGame, reveal, flag } = useGameState()
   const { tiles, gameOver, minesCount, won, timer } = state
-
-  useEffect(() => {
-    const myTimeout = setTimeout(setTimer, 1000)
-    return () => {
-      clearTimeout(myTimeout)
-    }
-  }, [setTimer, timer])
 
   return (
     <div className={styles.container}>

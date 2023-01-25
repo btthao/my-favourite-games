@@ -11,17 +11,7 @@ interface TileProps extends TileState {
   gameOver: boolean
 }
 
-const Tile: React.FC<TileProps> = ({
-  index,
-  hasMine,
-  isFlagged,
-  isRevealed,
-  isClickedMine,
-  surroundingMines,
-  reveal,
-  flag,
-  gameOver,
-}) => {
+const Tile: React.FC<TileProps> = ({ index, hasMine, isFlagged, isRevealed, isClickedMine, surroundingMines, reveal, flag, gameOver }) => {
   let className = styles.tile
 
   if (isRevealed) {
@@ -46,19 +36,8 @@ const Tile: React.FC<TileProps> = ({
         flag(index)
       }}
     >
-      <div
-        className={styles.inner}
-        data-value={showSurroundingMines ? surroundingMines : null}
-      >
-        {showFlag ? (
-          <BsFillFlagFill className={styles.flag} />
-        ) : showMine ? (
-          <FaBomb />
-        ) : showSurroundingMines ? (
-          surroundingMines
-        ) : (
-          ''
-        )}
+      <div className={styles.inner} data-value={showSurroundingMines ? surroundingMines : null}>
+        {showFlag ? <BsFillFlagFill className={styles.flag} /> : showMine ? <FaBomb /> : showSurroundingMines ? surroundingMines : ''}
         {showWrongFlag && <MdOutlineClose className={styles['wrong-flag']} />}
       </div>
     </div>
