@@ -8,7 +8,7 @@ import styles from 'styles/lines98/Game.module.scss'
 import { adjustColorIntensity } from 'utils/helpers'
 import { clickedOnActiveBall, DIMENSION, TILES_PER_SIDE } from 'utils/lines98'
 
-const Game = () => {
+const Game: React.FC<{ disabled: boolean }> = ({ disabled }) => {
   const [localStorage, setLocalStorage] = useLocalStorage<GameState>('lines98', DEFAULT_GAME_STATE)
 
   const { moveSelectedBall, selectBall, selectDestination, bounceSelectedBall, state, restart, growBalls, shrinkBalls, undo } = useGameState(localStorage)
@@ -54,7 +54,7 @@ const Game = () => {
   }
 
   const mouseClicked = (p5: p5Types) => {
-    if (gameOver) return
+    if (gameOver || disabled) return
 
     const { mouseX, mouseY, floor } = p5
 

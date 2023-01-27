@@ -1,68 +1,68 @@
 .status-bar {
-    @include m.flex-center;
-    width: 100%;
-    justify-content: space-between;
-    position: relative;
-    padding: 1.5em 2rem;
+  @include m.flex-center;
+  width: 100%;
+  justify-content: space-between;
+  position: relative;
+  padding: 1.5em 2rem;
 }
 
 .mid {
-    @include m.position-center;
-    @include m.flex-center;
-    gap: 0.3rem;
-    .restart {
-        display: flex;
-        position: relative;
-        svg {
-            color: v.$yellow;
-            font-size: 2.75rem;
-        }
-        &::after {
-            content:'';
-            position: absolute;
-            top: 2.5%;
-            left: 2.5%;
-            width: 95%;
-            height: 95%;
-            background: black;
-            border-radius: 50%;
-            z-index: -1;
-        }
+  @include m.position-center;
+  @include m.flex-center;
+  gap: 0.3rem;
+  .restart {
+    display: flex;
+    position: relative;
+    svg {
+      color: v.$yellow;
+      font-size: 2.75rem;
     }
-    .undo {
-        display: flex;
-        position: relative;
-        svg {
-            font-size: 2.4rem;
-            color: black;
-        }
-       
+    &::after {
+      content: '';
+      position: absolute;
+      top: 2.5%;
+      left: 2.5%;
+      width: 95%;
+      height: 95%;
+      background: v.$dark;
+      border-radius: 50%;
+      z-index: -1;
     }
-    &.small .restart svg {
-        font-size: 2rem;
+  }
+  .undo {
+    display: flex;
+    position: relative;
+    svg {
+      font-size: 2.4rem;
+      color: v.$dark;
     }
+  }
+  &.small .restart svg {
+    font-size: 2rem;
+  }
 }
 
 .disabled {
-    opacity: 0.3;
-    pointer-events: none;
+  opacity: 0.3;
+  pointer-events: none;
 }
 
 .stat {
-    display: flex;
-    @include m.game-stat;
-    flex-direction: column-reverse;
-    gap: 0.1rem;
+  display: flex;
+  flex: 1;
+  flex-direction: column-reverse;
+  color: darken(v.$green, 7%);
+  gap: 0.1rem;
+  font-weight: 700;
+  padding: 0 1rem;
+  text-align: right;
+  font-size: 1.3rem;
+  &:nth-of-type(1) {
+    text-align: left;
+  }
+  > div:nth-of-type(2) {
+    color: v.$dark;
     font-weight: 700;
-    padding: 0 1rem;
-    font-size: 1.3rem;
-    flex: 1;
-    text-align: right;
-    &:nth-of-type(1) {
-        text-align: left;
-    }
-    > div:nth-of-type(2) {
-        font-weight: 700;
-        font-size: 1rem;
-    }
+    font-size: 1rem;
+  }
 }

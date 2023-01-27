@@ -1,4 +1,4 @@
-@use "sass:math";
+@use 'sass:math';
 .tile {
   font-weight: 700;
   position: absolute;
@@ -7,7 +7,8 @@
   font-size: 1.4rem;
   word-break: break-all;
   text-align: center;
-  @include m.tile-color(#0aae01);
+  background: v.$lightgray;
+  color: #0aae01;
 }
 
 .new {
@@ -27,19 +28,20 @@
   animation-duration: var(--duration);
 }
 
- $tile-colors:#b892f1,#7b97e0, #36b4a1,#9a62e3,#3c69ca,  #e975b9, #00b7ff, #03949e, #19b05f, #d02795, #f35b63 ,#fc941d ;
+$tile-colors: #b892f1, #7b97e0, #36b4a1, #9a62e3, #3c69ca, #e975b9, #00b7ff, #03949e, #19b05f, #d02795, #f35b63, #fc941d;
 
 @for $i from 1 through length($tile-colors) {
   $color: nth($tile-colors, $i);
   $value: math.pow(2, $i);
-  .tile[data-value="#{$value}"] {
-    @include m.tile-color($color);
+
+  .tile[data-value='#{$value}'] {
+    color: $color;
     @if $value > 10000 {
-        font-size: 1.5rem;
+      font-size: 1.5rem;
     } @else if $value > 1000 {
-        font-size: 1.9rem;
+      font-size: 1.9rem;
     } @else {
-        font-size: 2.3rem;
+      font-size: 2.3rem;
     }
   }
 }

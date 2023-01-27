@@ -1,5 +1,4 @@
 .container {
-   @include m.game-container;
-   justify-content: space-between;
-   height: 100%;
+  @include m.game-container;
+  justify-content: space-between;
 }

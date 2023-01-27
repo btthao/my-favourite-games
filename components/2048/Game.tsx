@@ -6,7 +6,7 @@ import useLocalStorage from 'hooks/useLocalStorage'
 import StatusBar from 'components/window/StatusBar'
 import { GRID_SIZE, TILE_SIZE } from 'utils/2048'
 
-const Game: React.FC = () => {
+const Game: React.FC<{ disabled: boolean }> = ({ disabled }) => {
   const [localStorage, setLocalStorage] = useLocalStorage<GameState>('2048', DEFAULT_GAME_STATE)
 
   const { state, moveDown, moveUp, moveLeft, moveRight, newGame } = useGameState(localStorage)
@@ -16,7 +16,7 @@ const Game: React.FC = () => {
     const handleKeyDown = (event: any) => {
       const { ctrlKey, key, metaKey } = event
 
-      if (ctrlKey || metaKey || gameOver) {
+      if (ctrlKey || metaKey || gameOver || disabled) {
         return
       }
 
@@ -43,7 +43,7 @@ const Game: React.FC = () => {
     return () => {
       window.removeEventListener('keydown', handleKeyDown)
     }
-  }, [moveDown, moveLeft, moveRight, moveUp, gameOver])
+  }, [moveDown, moveLeft, moveRight, moveUp, gameOver, disabled])
 
   useEffect(() => {
     setLocalStorage(state)

@@ -1,7 +1,6 @@
 import { BallState, getCanvasPosition, TILES_PER_SIDE } from './lines98'
 import { TilePosition } from './tile'
 
-// path finding astar algo
 interface PathNode {
   position: TilePosition
   f: number // cost from start to end through this node, f = g+h
