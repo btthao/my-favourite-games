@@ -3,7 +3,7 @@ const nextConfig = {
   reactStrictMode: false,
   swcMinify: true,
   sassOptions: {
-    includePaths: ['./styles/theme'],
+    includePaths: ['./styles/utils'],
     prependData: `@use "variables" as v; @use "mixins" as m;`,
   },
 }
