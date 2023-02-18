@@ -1,70 +1,87 @@
+import { DEFAULT_IMAGE, DEFAULT_LEVEL, difficultyLevels, DIMENSION, imageOptions, updateCanvasPosition } from './../utils/slidePuzzle'
+import { selectRandomFromList, swapInArray } from './../utils/helpers'
 import { useCallback, useReducer } from 'react'
 import { TilePosition } from 'utils/tile'
-import { TileState } from 'utils/slidePuzzle'
-import produce from 'immer'
+import { isValidMove, TileState } from 'utils/slidePuzzle'
 
 const ACTION_TYPE_NEW_GAME = 'new-game'
 const ACTION_TYPE_INITIALIZE_TILES = 'initialize-tiles'
 const ACTION_TYPE_CLICK = 'move-tile'
+const ACTION_TYPE_CHANGE_SETUP = 'change-setup'
 
 export interface GameState {
   imageSrc: string
   tiles: TileState[]
   emptyTileIdx: number
-  difficulty: number
+  tilesPerSide: number
+  tileSize: number
 }
 
 export const DEFAULT_GAME_STATE: GameState = {
-  imageSrc: '/taylor/reputation.jpeg',
+  imageSrc: DEFAULT_IMAGE,
   tiles: [],
-  emptyTileIdx: 15,
-  difficulty: 4,
+  emptyTileIdx: DEFAULT_LEVEL * DEFAULT_LEVEL - 1,
+  tilesPerSide: DEFAULT_LEVEL,
+  tileSize: DIMENSION / DEFAULT_LEVEL,
 }
 
-function reduce(state: GameState, action: { payload?: { tiles?: TileState[]; position?: TilePosition }; type: string }): GameState {
+interface Payload {
+  tiles?: TileState[]
+  tilePosition?: TilePosition
+  setup?: { imageSrc: string; tilesPerSide: number }
+}
+
+function reduce(state: GameState, action: { payload?: Payload; type: string }): GameState {
   const { type, payload } = action
 
   switch (type) {
     case ACTION_TYPE_INITIALIZE_TILES: {
       if (!payload?.tiles?.length) return state
 
-      //   shuffle
+      const { tilesPerSide, tileSize } = state
+
+      let emptyTileIdx = state.emptyTileIdx
+
+      const tiles = [...payload.tiles, { correctIdx: emptyTileIdx }]
+
+      const moves = [1, -1, tilesPerSide, tilesPerSide * -1]
+
+      for (let i = 0; i < 100; i++) {
+        let newIdx = emptyTileIdx
+
+        while (newIdx == state.emptyTileIdx || emptyTileIdx == newIdx || !isValidMove(emptyTileIdx, newIdx, tilesPerSide)) {
+          newIdx = emptyTileIdx + selectRandomFromList(moves)
+        }
+
+        swapInArray(tiles, newIdx, emptyTileIdx)
+
+        emptyTileIdx = newIdx
+      }
+
+      updateCanvasPosition(tiles, tileSize, tilesPerSide)
 
       return {
         ...state,
-        tiles: payload.tiles,
+        tiles,
+        emptyTileIdx,
       }
     }
 
     case ACTION_TYPE_CLICK: {
-      if (payload?.position == undefined) return state
+      if (payload?.tilePosition == undefined) return state
 
-      const { difficulty, emptyTileIdx } = state
+      const { tilesPerSide, emptyTileIdx, tileSize } = state
 
-      const { r, c } = payload?.position
+      const { r, c } = payload.tilePosition
 
-      const clickedTileIdx = difficulty * r + c
+      const clickedTileIdx = tilesPerSide * r + c
 
-      const isRight = emptyTileIdx - 1 == clickedTileIdx && emptyTileIdx % difficulty !== 0
-      const isLeft = emptyTileIdx + 1 == clickedTileIdx && clickedTileIdx % difficulty !== 0
-      const isAbove = emptyTileIdx + difficulty == clickedTileIdx
-      const isBelow = emptyTileIdx - difficulty == clickedTileIdx
+      if (!isValidMove(emptyTileIdx, clickedTileIdx, tilesPerSide)) return state
 
-      if (!isRight && !isLeft && !isAbove && !isBelow) return state
+      const tiles = [...state.tiles]
 
-      const tiles = produce(state.tiles, (draft) => {
-        for (const tile of draft) {
-          if (tile.currentIdx == clickedTileIdx) {
-            const newIdx = isRight ? clickedTileIdx + 1 : isLeft ? clickedTileIdx - 1 : isAbove ? clickedTileIdx - difficulty : clickedTileIdx + difficulty
-
-            const r = Math.floor(newIdx / difficulty)
-            const c = newIdx % difficulty
-
-            tile.currentIdx = newIdx
-            tile.position = { r, c }
-          }
-        }
-      })
+      swapInArray(tiles, clickedTileIdx, emptyTileIdx)
+      updateCanvasPosition(tiles, tileSize, tilesPerSide)
 
       return {
         ...state,
@@ -73,6 +90,19 @@ function reduce(state: GameState, action: { payload?: { tiles?: TileState[]; pos
       }
     }
 
+    case ACTION_TYPE_CHANGE_SETUP: {
+      if (!payload?.setup) return state
+
+      const { imageSrc, tilesPerSide } = payload.setup
+
+      return {
+        ...state,
+        imageSrc,
+        emptyTileIdx: tilesPerSide * tilesPerSide - 1,
+        tilesPerSide,
+        tileSize: DIMENSION / tilesPerSide,
+      }
+    }
     case ACTION_TYPE_NEW_GAME: {
       return DEFAULT_GAME_STATE
     }
@@ -100,11 +130,18 @@ const useGameState = () => {
   const clickTile = useCallback((position: TilePosition) => {
     dispatch({
       type: ACTION_TYPE_CLICK,
-      payload: { position },
+      payload: { tilePosition: position },
     })
   }, [])
 
-  return { state, newGame, initializeTiles, clickTile }
+  const changeSetup = useCallback((setup: Payload['setup']) => {
+    dispatch({
+      type: ACTION_TYPE_CHANGE_SETUP,
+      payload: { setup },
+    })
+  }, [])
+
+  return { state, newGame, initializeTiles, clickTile, changeSetup }
 }
 
 export default useGameState

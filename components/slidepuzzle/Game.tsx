@@ -7,8 +7,7 @@ import { DIMENSION, TileState } from 'utils/slidePuzzle'
 
 const Game: React.FC<{ disabled: boolean }> = ({ disabled }) => {
   const { newGame, state, clickTile, initializeTiles } = useGameState()
-  const { imageSrc, tiles, difficulty } = state
-  const tileSize = DIMENSION / difficulty
+  const { imageSrc, tiles, tilesPerSide, tileSize } = state
 
   const setup = (p5: p5Types, canvasParentRef: Element) => {
     p5.createCanvas(DIMENSION, DIMENSION).parent(canvasParentRef)
@@ -16,18 +15,18 @@ const Game: React.FC<{ disabled: boolean }> = ({ disabled }) => {
     p5.loadImage(imageSrc, (img) => {
       const tilesCutFromImage: TileState[] = []
 
-      for (let r = 0; r < difficulty; r++) {
-        for (let c = 0; c < difficulty; c++) {
-          const idx = difficulty * r + c
+      for (let r = 0; r < tilesPerSide; r++) {
+        for (let c = 0; c < tilesPerSide; c++) {
+          const idx = tilesPerSide * r + c
 
-          const width = img.width / 4
-          const height = img.height / 4
+          const width = img.width / tilesPerSide
+          const height = img.height / tilesPerSide
 
-          let cutImg = p5.createImage(width, height)
+          const cutImg = p5.createImage(width, height)
 
           cutImg.copy(img, c * width, r * height, width, height, 0, 0, width, height)
 
-          tilesCutFromImage.push({ img: cutImg, correctIdx: idx, currentIdx: idx, position: { r, c } })
+          tilesCutFromImage.push({ img: cutImg, correctIdx: idx })
         }
       }
 
@@ -37,25 +36,25 @@ const Game: React.FC<{ disabled: boolean }> = ({ disabled }) => {
     })
 
     p5.stroke('#6c9d66')
-    p5.strokeWeight(0.75)
+    p5.strokeWeight(0.5)
   }
 
   const draw = (p5: p5Types) => {
     p5.background('#6c9d66')
 
-    for (const tile of tiles) {
-      const { img, position } = tile
+    // draw images
+    for (let i = 0; i < tiles.length; i++) {
+      const { canvasPosition, img } = tiles[i]
 
-      const x = tileSize * position.c
-      const y = tileSize * position.r
+      if (!img || !canvasPosition) continue
 
-      p5.image(img, x, y, tileSize, tileSize)
+      p5.image(img, canvasPosition.x, canvasPosition.y, tileSize, tileSize)
     }
 
     // draw lines
-    for (let i = 1; i < difficulty; i++) {
-      p5.line((i * DIMENSION) / difficulty, 0, (i * DIMENSION) / difficulty, DIMENSION)
-      p5.line(0, (i * DIMENSION) / difficulty, DIMENSION, (i * DIMENSION) / difficulty)
+    for (let i = 1; i < tilesPerSide; i++) {
+      p5.line((i * DIMENSION) / tilesPerSide, 0, (i * DIMENSION) / tilesPerSide, DIMENSION)
+      p5.line(0, (i * DIMENSION) / tilesPerSide, DIMENSION, (i * DIMENSION) / tilesPerSide)
     }
   }
 
@@ -68,8 +67,8 @@ const Game: React.FC<{ disabled: boolean }> = ({ disabled }) => {
 
     if (clickedOutsideSketch) return
 
-    let c = floor((mouseX / DIMENSION) * difficulty)
-    let r = floor((mouseY / DIMENSION) * difficulty)
+    let c = floor((mouseX / DIMENSION) * tilesPerSide)
+    let r = floor((mouseY / DIMENSION) * tilesPerSide)
 
     clickTile({ r, c })
   }
@@ -94,7 +93,7 @@ const Game: React.FC<{ disabled: boolean }> = ({ disabled }) => {
       />
       <div>
         {/* @ts-ignore */}
-        <Sketch setup={setup} draw={draw} mouseClicked={mouseClicked} />
+        <Sketch key={imageSrc + tilesPerSide} setup={setup} draw={draw} mouseClicked={mouseClicked} />
       </div>
     </div>
   )
