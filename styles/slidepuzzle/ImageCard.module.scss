@@ -1,0 +1,20 @@
+.card {
+  @include m.flex-center;
+  flex-direction: column;
+  background: #f1f1f2;
+  width: 150px;
+  border-radius: 0.3rem;
+  overflow: hidden;
+  cursor: pointer;
+  img {
+    object-fit: contain;
+  }
+  p {
+    margin: 7px auto;
+    color: v.$purple;
+  }
+  &:hover {
+    box-shadow: 0 0.1em 1em 0 rgba(149, 149, 207, 0.9);
+    transition: box-shadow 0.4s ease-in-out;
+  }
+}
