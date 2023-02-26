@@ -1,0 +1,37 @@
+.backdrop {
+  @include m.position-absolute;
+  background: rgba(78, 78, 78, 0.4);
+  visibility: hidden;
+  opacity: 0;
+  z-index: 1000;
+}
+
+.show {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.modal {
+  @include m.position-center;
+  background: v.$white;
+  box-shadow: 0 8px 32px 0 rgb(71, 71, 74);
+  border-radius: 0.5rem;
+  min-width: 350px;
+  max-width: 70%;
+  min-height: 200px;
+  max-height: 75%;
+  color: v.$dark;
+  overflow: scroll;
+  .content {
+    padding: 30px 10px;
+  }
+}
+
+.title-bar {
+  @include m.title-bar;
+  @include m.title-bar-sm;
+  position: sticky;
+  top: 0;
+  z-index: 500;
+}

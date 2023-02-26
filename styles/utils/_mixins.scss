@@ -56,9 +56,26 @@
   }
 }
 
+@mixin title-bar-sm {
+  font-size: 0.85rem;
+  height: 27px;
+  button {
+    font-size: 0.8rem;
+    padding: 0.1rem;
+  }
+}
+
 @mixin game-over-modal {
   background: #d3d8db;
   border: 0.1em solid rgba(145, 145, 145, 0.38);
   border-radius: 0.4rem;
   box-shadow: 0 0.7em 1.1em 0 rgba(72, 72, 75, 0.77);
+}
+
+@mixin hide-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
