@@ -9,7 +9,7 @@ const Game = dynamic(() => import('components/slidepuzzle/Game'), {
 })
 
 const SlidePuzzle = () => {
-  return <Window minHeight={626} minWidth={500} component={Game} title="Taylor's Puzzle" disableResize></Window>
+  return <Window minHeight={570} minWidth={770} component={Game} title="Taylor's Puzzle" disableResize></Window>
 }
 
 export default SlidePuzzle

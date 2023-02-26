@@ -6,31 +6,11 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 .title-bar {
-  width: 100%;
-  font-weight: 600;
-  font-size: 0.95rem;
-  color: v.$dark;
-  background: #dbdadf;
-  padding: 0 0.6rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  height: 30px;
-  > div {
-    display: flex;
-  }
-  button {
-    @include m.flex-center;
-    background: v.$white;
-    border: none;
-    margin-left: 0.3rem;
-    border-radius: 50%;
-    font-size: 0.9rem;
-    padding: 0.15rem;
-  }
+  @include m.title-bar;
 }
 
 .inner {

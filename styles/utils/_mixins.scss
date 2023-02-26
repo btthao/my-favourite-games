@@ -28,6 +28,32 @@
   position: relative;
   color: $white;
   height: 100%;
+  overflow: hidden;
+}
+
+@mixin title-bar {
+  width: 100%;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: $dark;
+  background: #dbdadf;
+  padding: 0 0.6rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 30px;
+  > div {
+    display: flex;
+  }
+  button {
+    @include flex-center;
+    background: $white;
+    border: none;
+    margin-left: 0.3rem;
+    border-radius: 50%;
+    font-size: 0.9rem;
+    padding: 0.15rem;
+  }
 }
 
 @mixin game-over-modal {
