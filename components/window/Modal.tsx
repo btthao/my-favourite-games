@@ -4,7 +4,7 @@ import { IoCloseSharp } from 'react-icons/io5'
 
 interface ModalProps {
   name: string
-  children: JSX.Element[]
+  children: JSX.Element | JSX.Element[]
 }
 
 const Modal: React.FC<ModalProps> = ({ name, children }) => {

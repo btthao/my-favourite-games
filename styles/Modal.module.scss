@@ -19,12 +19,14 @@
   border-radius: 0.5rem;
   min-width: 350px;
   max-width: 70%;
-  min-height: 200px;
-  max-height: 75%;
-  color: v.$dark;
-  overflow: scroll;
+  overflow: hidden;
   .content {
-    padding: 30px 10px;
+    padding: 15px;
+    height: fit-content;
+    min-height: 200px;
+    max-height: 450px;
+    color: v.$dark;
+    overflow: scroll;
   }
 }
 
