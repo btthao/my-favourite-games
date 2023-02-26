@@ -2,10 +2,10 @@
   @include m.flex-center;
   flex-direction: column;
   background: #f1f1f2;
-  width: 150px;
   border-radius: 0.3rem;
   overflow: hidden;
   cursor: pointer;
+  position: relative;
   img {
     object-fit: contain;
   }
@@ -16,5 +16,24 @@
   &:hover {
     box-shadow: 0 0.1em 1em 0 rgba(149, 149, 207, 0.9);
     transition: box-shadow 0.4s ease-in-out;
+  }
+}
+
+.selected {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: v.$purple;
+  z-index: 10;
+  height: 2rem;
+  font-size: 2rem;
+  &::after {
+    content: '';
+    @include m.position-center;
+    background: rgb(255, 255, 255);
+    width: 50%;
+    height: 50%;
+    border-radius: 50%;
+    z-index: -1;
   }
 }
