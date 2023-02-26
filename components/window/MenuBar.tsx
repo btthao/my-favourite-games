@@ -2,7 +2,7 @@ import React from 'react'
 import styles from 'styles/MenuBar.module.scss'
 
 interface MenuBarProps {
-  children: JSX.Element[]
+  children: JSX.Element | JSX.Element[]
 }
 
 const MenuBar: React.FC<MenuBarProps> = ({ children }) => {
