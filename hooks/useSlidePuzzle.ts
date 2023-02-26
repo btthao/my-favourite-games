@@ -7,7 +7,7 @@ import { isValidMove, TileState } from 'utils/slidePuzzle'
 const ACTION_TYPE_NEW_GAME = 'new-game'
 const ACTION_TYPE_INITIALIZE_TILES = 'initialize-tiles'
 const ACTION_TYPE_CLICK = 'move-tile'
-const ACTION_TYPE_CHANGE_SETUP = 'change-setup'
+const ACTION_TYPE_CHANGE_IMAGE = 'change-image'
 
 export interface GameState {
   imageSrc: string
@@ -26,13 +26,13 @@ export const DEFAULT_GAME_STATE: GameState = {
   tilesPerSide: DEFAULT_LEVEL,
   tileSize: DIMENSION / DEFAULT_LEVEL,
   moveCounts: 0,
-  timer: 0
+  timer: 0,
 }
 
 interface Payload {
   tiles?: TileState[]
   tilePosition?: TilePosition
-  setup?: { imageSrc: string; tilesPerSide: number }
+  imageSrc?: string
 }
 
 function reduce(state: GameState, action: { payload?: Payload; type: string }): GameState {
@@ -96,19 +96,19 @@ function reduce(state: GameState, action: { payload?: Payload; type: string }): 
       }
     }
 
-    case ACTION_TYPE_CHANGE_SETUP: {
-      if (!payload?.setup) return state
-
-      const { imageSrc, tilesPerSide } = payload.setup
+    case ACTION_TYPE_CHANGE_IMAGE: {
+      if (!payload?.imageSrc) return state
 
       return {
         ...state,
-        imageSrc,
-        emptyTileIdx: tilesPerSide * tilesPerSide - 1,
-        tilesPerSide,
-        tileSize: DIMENSION / tilesPerSide,
+        imageSrc: payload.imageSrc,
+        tiles: [],
+        emptyTileIdx: state.tilesPerSide * state.tilesPerSide - 1,
+        moveCounts: 0,
+        timer: 0,
       }
     }
+
     case ACTION_TYPE_NEW_GAME: {
       return DEFAULT_GAME_STATE
     }
@@ -140,14 +140,14 @@ const useGameState = () => {
     })
   }, [])
 
-  const changeSetup = useCallback((setup: Payload['setup']) => {
+  const changeImage = useCallback((imageSrc: string) => {
     dispatch({
-      type: ACTION_TYPE_CHANGE_SETUP,
-      payload: { setup },
+      type: ACTION_TYPE_CHANGE_IMAGE,
+      payload: { imageSrc },
     })
   }, [])
 
-  return { state, newGame, initializeTiles, clickTile, changeSetup }
+  return { state, newGame, initializeTiles, clickTile, changeImage }
 }
 
 export default useGameState

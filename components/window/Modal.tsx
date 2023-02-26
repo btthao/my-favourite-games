@@ -5,9 +5,10 @@ import { IoCloseSharp } from 'react-icons/io5'
 interface ModalProps {
   name: string
   children: JSX.Element | JSX.Element[]
+  onClose?: () => void
 }
 
-const Modal: React.FC<ModalProps> = ({ name, children }) => {
+const Modal: React.FC<ModalProps> = ({ name, children, onClose }) => {
   const [open, setOpen] = useState(false)
 
   const handleOpen = () => {
@@ -16,6 +17,9 @@ const Modal: React.FC<ModalProps> = ({ name, children }) => {
 
   const handleClose = () => {
     setOpen(false)
+    if (onClose) {
+      onClose()
+    }
   }
 
   return (
