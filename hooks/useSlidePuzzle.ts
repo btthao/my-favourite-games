@@ -15,6 +15,8 @@ export interface GameState {
   emptyTileIdx: number
   tilesPerSide: number
   tileSize: number
+  moveCounts: number
+  timer: number
 }
 
 export const DEFAULT_GAME_STATE: GameState = {
@@ -23,6 +25,8 @@ export const DEFAULT_GAME_STATE: GameState = {
   emptyTileIdx: DEFAULT_LEVEL * DEFAULT_LEVEL - 1,
   tilesPerSide: DEFAULT_LEVEL,
   tileSize: DIMENSION / DEFAULT_LEVEL,
+  moveCounts: 0,
+  timer: 0
 }
 
 interface Payload {
@@ -41,20 +45,22 @@ function reduce(state: GameState, action: { payload?: Payload; type: string }): 
       const { tilesPerSide, tileSize } = state
 
       let emptyTileIdx = state.emptyTileIdx
+      let prevEmptyTileIdx = emptyTileIdx
 
       const tiles = [...payload.tiles, { correctIdx: emptyTileIdx }]
 
       const moves = [1, -1, tilesPerSide, tilesPerSide * -1]
 
-      for (let i = 0; i < 100; i++) {
+      for (let i = 0; i < 50; i++) {
         let newIdx = emptyTileIdx
 
-        while (newIdx == state.emptyTileIdx || emptyTileIdx == newIdx || !isValidMove(emptyTileIdx, newIdx, tilesPerSide)) {
+        while (newIdx == prevEmptyTileIdx || newIdx == emptyTileIdx || !isValidMove(emptyTileIdx, newIdx, tilesPerSide)) {
           newIdx = emptyTileIdx + selectRandomFromList(moves)
         }
 
         swapInArray(tiles, newIdx, emptyTileIdx)
 
+        prevEmptyTileIdx = emptyTileIdx
         emptyTileIdx = newIdx
       }
 
