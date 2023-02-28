@@ -19,6 +19,7 @@ export interface GameState {
   moveCounts: number
   timer: number
   finished: boolean
+  showHint: boolean
 }
 
 export const DEFAULT_GAME_STATE: GameState = {
@@ -30,6 +31,7 @@ export const DEFAULT_GAME_STATE: GameState = {
   moveCounts: 0,
   timer: 0,
   finished: false,
+  showHint: false,
 }
 
 interface Payload {
@@ -54,7 +56,7 @@ function reduce(state: GameState, action: { payload?: Payload; type: string }): 
 
       const moves = [1, -1, tilesPerSide, tilesPerSide * -1]
 
-      for (let i = 0; i < 50; i++) {
+      for (let i = 0; i < state.tilesPerSide * 15; i++) {
         let newIdx = emptyTileIdx
 
         while (newIdx == prevEmptyTileIdx || newIdx == emptyTileIdx || !isValidMove(emptyTileIdx, newIdx, tilesPerSide)) {

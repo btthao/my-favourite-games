@@ -9,7 +9,7 @@ import GameInfo from './GameInfo'
 
 const Game: React.FC<{ disabled: boolean }> = ({ disabled }) => {
   const { newGame, state, clickTile, initializeTiles, changeImage } = useGameState()
-  const { imageSrc, tiles, tilesPerSide, tileSize, moveCounts, timer } = state
+  const { imageSrc, tiles, tilesPerSide, tileSize, moveCounts, timer, finished, showHint } = state
 
   const setup = (p5: p5Types, canvasParentRef: Element) => {
     p5.createCanvas(DIMENSION, DIMENSION).parent(canvasParentRef)
@@ -46,11 +46,17 @@ const Game: React.FC<{ disabled: boolean }> = ({ disabled }) => {
 
     // draw images
     for (let i = 0; i < tiles.length; i++) {
-      const { canvasPosition, img } = tiles[i]
+      const { canvasPosition, img, correctIdx } = tiles[i]
 
       if (!img || !canvasPosition) continue
 
       p5.image(img, canvasPosition.x, canvasPosition.y, tileSize, tileSize)
+
+      if (showHint) {
+        p5.textSize(tileSize / 7)
+        p5.text(correctIdx + 1, canvasPosition.x + tileSize / 15, canvasPosition.y + tileSize * 0.93)
+        p5.fill(255)
+      }
     }
 
     // draw lines
