@@ -1,6 +1,6 @@
 import { DEFAULT_IMAGE, DEFAULT_LEVEL, difficultyLevels, DIMENSION, imageOptions, updateCanvasPosition } from './../utils/slidePuzzle'
 import { selectRandomFromList, swapInArray } from './../utils/helpers'
-import { useCallback, useReducer } from 'react'
+import { useCallback, useEffect, useReducer } from 'react'
 import { TilePosition } from 'utils/tile'
 import { isValidMove, TileState } from 'utils/slidePuzzle'
 
@@ -8,6 +8,7 @@ const ACTION_TYPE_NEW_GAME = 'new-game'
 const ACTION_TYPE_INITIALIZE_TILES = 'initialize-tiles'
 const ACTION_TYPE_CLICK = 'move-tile'
 const ACTION_TYPE_CHANGE_IMAGE = 'change-image'
+const ACTION_TYPE_TIMER = 'timer'
 
 export interface GameState {
   imageSrc: string
@@ -17,6 +18,7 @@ export interface GameState {
   tileSize: number
   moveCounts: number
   timer: number
+  finished: boolean
 }
 
 export const DEFAULT_GAME_STATE: GameState = {
@@ -27,6 +29,7 @@ export const DEFAULT_GAME_STATE: GameState = {
   tileSize: DIMENSION / DEFAULT_LEVEL,
   moveCounts: 0,
   timer: 0,
+  finished: false,
 }
 
 interface Payload {
@@ -93,6 +96,16 @@ function reduce(state: GameState, action: { payload?: Payload; type: string }): 
         ...state,
         tiles,
         emptyTileIdx: clickedTileIdx,
+        moveCounts: state.moveCounts + 1,
+      }
+    }
+
+    case ACTION_TYPE_TIMER: {
+      if (state.finished) return state
+
+      return {
+        ...state,
+        timer: state.timer + 1,
       }
     }
 
@@ -146,6 +159,19 @@ const useGameState = () => {
       payload: { imageSrc },
     })
   }, [])
+
+  const setTimer = useCallback(() => {
+    dispatch({
+      type: ACTION_TYPE_TIMER,
+    })
+  }, [])
+
+  useEffect(() => {
+    const myTimeout = setTimeout(setTimer, 1000)
+    return () => {
+      clearTimeout(myTimeout)
+    }
+  }, [setTimer, state.timer])
 
   return { state, newGame, initializeTiles, clickTile, changeImage }
 }
