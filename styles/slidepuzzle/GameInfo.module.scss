@@ -1,0 +1,43 @@
+.container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  > div {
+    display: grid;
+    width: 100%;
+    border-radius: 0.3rem;
+    padding: 20px;
+    background: v.$silver;
+  }
+  h6,
+  p {
+    font-size: 1.2rem;
+    line-height: 1rem;
+    margin: 0;
+    margin-bottom: 1rem;
+  }
+  h6 {
+    color: v.$blue;
+  }
+  p {
+    line-height: 1.18rem;
+    margin-left: 6px;
+    font-size: 1rem;
+  }
+}
+
+.stats {
+  display: grid;
+  gap: 20px;
+  > div {
+    display: flex;
+  }
+}
+
+.preview {
+  img {
+    width: 100%;
+    border-radius: 0.3rem;
+  }
+}
