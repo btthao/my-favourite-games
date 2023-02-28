@@ -1,13 +1,15 @@
-import StatusBar from 'components/window/StatusBar'
+import MenuBar from 'components/window/MenuBar'
 import useGameState from 'hooks/useSlidePuzzle'
 import p5Types from 'p5'
 import Sketch from 'react-p5'
 import styles from 'styles/slidepuzzle/Game.module.scss'
 import { DIMENSION, TileState } from 'utils/slidePuzzle'
+import OptionsModal from './OptionsModal'
+import GameInfo from './GameInfo'
 
 const Game: React.FC<{ disabled: boolean }> = ({ disabled }) => {
-  const { newGame, state, clickTile, initializeTiles } = useGameState()
-  const { imageSrc, tiles, tilesPerSide, tileSize } = state
+  const { newGame, state, clickTile, initializeTiles, changeImage } = useGameState()
+  const { imageSrc, tiles, tilesPerSide, tileSize, moveCounts, timer } = state
 
   const setup = (p5: p5Types, canvasParentRef: Element) => {
     p5.createCanvas(DIMENSION, DIMENSION).parent(canvasParentRef)
@@ -35,12 +37,12 @@ const Game: React.FC<{ disabled: boolean }> = ({ disabled }) => {
       initializeTiles(tilesCutFromImage)
     })
 
-    p5.stroke('#6c9d66')
+    p5.stroke('#8094bf')
     p5.strokeWeight(0.5)
   }
 
   const draw = (p5: p5Types) => {
-    p5.background('#6c9d66')
+    p5.background('#8094bf')
 
     // draw images
     for (let i = 0; i < tiles.length; i++) {
@@ -75,25 +77,15 @@ const Game: React.FC<{ disabled: boolean }> = ({ disabled }) => {
 
   return (
     <div className={styles.container}>
-      <StatusBar
-        gameOver={false}
-        restart={newGame}
-        leftComponent={
-          <>
-            {/* <div>{score}</div> */}
-            <div>Score</div>
-          </>
-        }
-        rightComponent={
-          <>
-            {/* <div>{bestScore}</div> */}
-            <div>Best</div>
-          </>
-        }
-      />
-      <div>
-        {/* @ts-ignore */}
-        <Sketch key={imageSrc + tilesPerSide} setup={setup} draw={draw} mouseClicked={mouseClicked} />
+      <MenuBar>
+        <OptionsModal currentImage={imageSrc} changeImage={changeImage} />
+      </MenuBar>
+      <div className={styles.grid}>
+        <div>
+          {/* @ts-ignore */}
+          <Sketch key={imageSrc + tilesPerSide} setup={setup} draw={draw} mouseClicked={mouseClicked} />
+        </div>
+        <GameInfo imageSrc={imageSrc} timer={timer} moveCounts={moveCounts} />
       </div>
     </div>
   )
