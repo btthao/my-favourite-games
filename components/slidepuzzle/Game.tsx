@@ -9,7 +9,7 @@ import GameInfo from './GameInfo'
 
 const Game: React.FC<{ disabled: boolean }> = ({ disabled }) => {
   const { newGame, state, clickTile, initializeTiles, changeImage } = useGameState()
-  const { imageSrc, tiles, tilesPerSide, tileSize, moveCounts, timer, finished, showHint } = state
+  const { imageSrc, tiles, tilesPerSide, tileSize, moveCounts, timer, finished, showHint, isLoading } = state
 
   const setup = (p5: p5Types, canvasParentRef: Element) => {
     p5.createCanvas(DIMENSION, DIMENSION).parent(canvasParentRef)
@@ -87,9 +87,10 @@ const Game: React.FC<{ disabled: boolean }> = ({ disabled }) => {
         <OptionsModal currentImage={imageSrc} changeImage={changeImage} />
       </MenuBar>
       <div className={styles.grid}>
-        <div>
+        <div className={styles.sketch}>
           {/* @ts-ignore */}
           <Sketch key={imageSrc + tilesPerSide} setup={setup} draw={draw} mouseClicked={mouseClicked} />
+          {isLoading && <div className={styles.loading}>Slicing images...</div>}
         </div>
         <GameInfo imageSrc={imageSrc} timer={timer} moveCounts={moveCounts} />
       </div>

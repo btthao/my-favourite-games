@@ -14,3 +14,15 @@
   gap: 15px;
   color: v.$dark;
 }
+
+.sketch {
+  position: relative;
+}
+
+.loading {
+  @include m.position-absolute;
+  background: #8094bf;
+  display: grid;
+  place-items: center;
+  font-size: 1.8rem;
+}

@@ -20,6 +20,7 @@ export interface GameState {
   timer: number
   finished: boolean
   showHint: boolean
+  isLoading: boolean
 }
 
 export const DEFAULT_GAME_STATE: GameState = {
@@ -32,6 +33,7 @@ export const DEFAULT_GAME_STATE: GameState = {
   timer: 0,
   finished: false,
   showHint: false,
+  isLoading: true,
 }
 
 interface Payload {
@@ -75,6 +77,7 @@ function reduce(state: GameState, action: { payload?: Payload; type: string }): 
         ...state,
         tiles,
         emptyTileIdx,
+        isLoading: false,
       }
     }
 
@@ -121,6 +124,7 @@ function reduce(state: GameState, action: { payload?: Payload; type: string }): 
         emptyTileIdx: state.tilesPerSide * state.tilesPerSide - 1,
         moveCounts: 0,
         timer: 0,
+        isLoading: true,
       }
     }
 
