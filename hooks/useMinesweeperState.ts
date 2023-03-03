@@ -1,16 +1,14 @@
 import produce from 'immer'
-import { useCallback, useEffect, useReducer } from 'react'
+import { useCallback, useReducer } from 'react'
 import { expandMineFreeArea, initMinesweeper, TileState, TOTAL_COLS, TOTAL_ROWS, DEFAULT_TILE_STATE, TOTAL_MINES, checkWin, revealAllMines } from 'utils/minesweeper'
 
 const ACTION_TYPE_REVEAL = 'reveal'
 const ACTION_TYPE_FLAG = 'flag'
 const ACTION_TYPE_NEW_GAME = 'new-game'
-const ACTION_TYPE_TIMER = 'timer'
 
 export interface GameState {
   tiles: TileState[]
   minesCount: number
-  timer: number
   gameOver: boolean
   isInitialized: boolean
   won: boolean
@@ -19,7 +17,6 @@ export interface GameState {
 export const DEFAULT_GAME_STATE: GameState = {
   tiles: new Array(TOTAL_COLS * TOTAL_ROWS).fill(DEFAULT_TILE_STATE),
   minesCount: TOTAL_MINES,
-  timer: 0,
   gameOver: false,
   isInitialized: false,
   won: false,
@@ -92,15 +89,6 @@ function reduce(state: GameState, action: { payload?: { tileIndex: number }; typ
       }
     }
 
-    case ACTION_TYPE_TIMER: {
-      if (state.gameOver) return state
-
-      return {
-        ...state,
-        timer: state.timer + 1,
-      }
-    }
-
     case ACTION_TYPE_NEW_GAME: {
       return DEFAULT_GAME_STATE
     }
@@ -132,20 +120,7 @@ const useGameState = () => {
     })
   }, [])
 
-  const setTimer = useCallback(() => {
-    dispatch({
-      type: ACTION_TYPE_TIMER,
-    })
-  }, [])
-
-  useEffect(() => {
-    const myTimeout = setTimeout(setTimer, 1000)
-    return () => {
-      clearTimeout(myTimeout)
-    }
-  }, [setTimer, state.timer])
-
-  return { state, newGame, reveal, flag, setTimer }
+  return { state, newGame, reveal, flag }
 }
 
 export default useGameState

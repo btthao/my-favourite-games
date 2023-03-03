@@ -1,6 +1,6 @@
-import { DEFAULT_IMAGE, DEFAULT_LEVEL, difficultyLevels, DIMENSION, imageOptions, updateCanvasPosition } from './../utils/slidePuzzle'
+import { DEFAULT_IMAGE, DEFAULT_LEVEL, DIMENSION, updateCanvasPosition } from './../utils/slidePuzzle'
 import { selectRandomFromList, swapInArray } from './../utils/helpers'
-import { useCallback, useEffect, useReducer } from 'react'
+import { useCallback, useReducer } from 'react'
 import { TilePosition } from 'utils/tile'
 import { isValidMove, TileState } from 'utils/slidePuzzle'
 
@@ -8,7 +8,6 @@ const ACTION_TYPE_NEW_GAME = 'new-game'
 const ACTION_TYPE_INITIALIZE_TILES = 'initialize-tiles'
 const ACTION_TYPE_CLICK = 'move-tile'
 const ACTION_TYPE_CHANGE_IMAGE = 'change-image'
-const ACTION_TYPE_TIMER = 'timer'
 
 export interface GameState {
   imageSrc: string
@@ -17,7 +16,6 @@ export interface GameState {
   tilesPerSide: number
   tileSize: number
   moveCounts: number
-  timer: number
   finished: boolean
   showHint: boolean
   isLoading: boolean
@@ -30,7 +28,6 @@ export const DEFAULT_GAME_STATE: GameState = {
   tilesPerSide: DEFAULT_LEVEL,
   tileSize: DIMENSION / DEFAULT_LEVEL,
   moveCounts: 0,
-  timer: 0,
   finished: false,
   showHint: false,
   isLoading: true,
@@ -105,15 +102,6 @@ function reduce(state: GameState, action: { payload?: Payload; type: string }): 
       }
     }
 
-    case ACTION_TYPE_TIMER: {
-      if (state.finished) return state
-
-      return {
-        ...state,
-        timer: state.timer + 1,
-      }
-    }
-
     case ACTION_TYPE_CHANGE_IMAGE: {
       if (!payload?.imageSrc) return state
 
@@ -123,7 +111,6 @@ function reduce(state: GameState, action: { payload?: Payload; type: string }): 
         tiles: [],
         emptyTileIdx: state.tilesPerSide * state.tilesPerSide - 1,
         moveCounts: 0,
-        timer: 0,
         isLoading: true,
       }
     }
@@ -165,19 +152,6 @@ const useGameState = () => {
       payload: { imageSrc },
     })
   }, [])
-
-  const setTimer = useCallback(() => {
-    dispatch({
-      type: ACTION_TYPE_TIMER,
-    })
-  }, [])
-
-  useEffect(() => {
-    const myTimeout = setTimeout(setTimer, 1000)
-    return () => {
-      clearTimeout(myTimeout)
-    }
-  }, [setTimer, state.timer])
 
   return { state, newGame, initializeTiles, clickTile, changeImage }
 }

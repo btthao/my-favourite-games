@@ -1,4 +1,5 @@
 import Confetti from 'components/miscellaneous/Confetti'
+import Timer from 'components/miscellaneous/Timer'
 import StatusBar from 'components/window/StatusBar'
 import useGameState from 'hooks/useMinesweeperState'
 import styles from 'styles/minesweeper/Game.module.scss'
@@ -6,7 +7,7 @@ import Tile from './Tile'
 
 const Game: React.FC = () => {
   const { state, newGame, reveal, flag } = useGameState()
-  const { tiles, gameOver, minesCount, won, timer } = state
+  const { tiles, gameOver, minesCount, won } = state
 
   return (
     <div className={styles.container}>
@@ -23,7 +24,9 @@ const Game: React.FC = () => {
         }
         rightComponent={
           <>
-            <div>{timer}</div>
+            <div>
+              <Timer />
+            </div>
             <div>Timer</div>
           </>
         }
