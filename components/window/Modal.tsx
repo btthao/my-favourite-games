@@ -25,7 +25,7 @@ const Modal: React.FC<ModalProps> = ({ name, children, onClose }) => {
   return (
     <div>
       <button onClick={handleOpen}>{name}</button>
-      <div className={`${styles.backdrop} ` + ` ${open ? styles.show : ''}`}>
+      <div onClick={(e) => e.stopPropagation()} className={`${styles.backdrop} ` + ` ${open ? styles.show : ''}`}>
         <div className={styles.modal}>
           <div className={styles['title-bar']}>
             <div>{name}</div>
