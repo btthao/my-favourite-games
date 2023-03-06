@@ -4,7 +4,7 @@ import p5Types from 'p5'
 import Sketch from 'react-p5'
 import styles from 'styles/slidepuzzle/Game.module.scss'
 import { DIMENSION, TileState } from 'utils/slidePuzzle'
-import OptionsModal from './OptionsModal'
+import PuzzleImgOptionsModal from './PuzzleImgOptionsModal'
 import GameInfo from './GameInfo'
 import LevelOptionsDropdown from './LevelOptionsDropdown'
 
@@ -85,7 +85,7 @@ const Game: React.FC<{ disabled: boolean }> = ({ disabled }) => {
   return (
     <div className={styles.container}>
       <MenuBar>
-        <OptionsModal currentImage={imageSrc} changeImage={changeImage} />
+        <PuzzleImgOptionsModal currentImage={imageSrc} changeImage={changeImage} />
         <LevelOptionsDropdown />
       </MenuBar>
       <div className={styles.grid}>

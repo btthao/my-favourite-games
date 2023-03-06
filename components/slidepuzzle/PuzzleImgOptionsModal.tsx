@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import Modal from 'components/window/Modal'
+import Modal from 'components/window/modal/Modal'
 import { imageOptions } from 'utils/slidePuzzle'
 import ImageCard from '../miscellaneous/ImageCard'
 import styles from 'styles/slidepuzzle/OptionsModal.module.scss'
