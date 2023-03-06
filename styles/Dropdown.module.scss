@@ -1,27 +1,37 @@
 .wrapper {
-    position: relative;
+  position: relative;
 }
-
-.backdrop {
-  @include m.position-absolute;
-  background: rgba(100, 100, 100, 0.9);
-  visibility: hidden;
-  opacity: 0;
-  z-index: 1000;
-  color: v.$dark;
-  top: 30px;
-}
-
 
 .items {
-    background: black;
-    top: 25px;
-    position: absolute;
-    z-index: 3000;
-    min-width: 100px;
-    height: fit-content;
-    visibility: hidden;
-    opacity: 0;
+  background: v.$transparentsilver;
+  color: v.$dark;
+  top: 23px;
+  position: absolute;
+  z-index: 3000;
+  min-width: 130px;
+  visibility: hidden;
+  opacity: 0;
+  padding: 4px;
+  border-radius: 0.3rem;
+  font-size: 0.95rem;
+  > div {
+    @include m.disable-user-select;
+    display: flex;
+    align-items: center;
+    border-radius: 0.2rem;
+    height: 25px;
+    &:hover {
+      background: v.$lightpurple;
+    }
+    span:first-of-type {
+      display: inline-block;
+      width: 27px;
+      svg {
+        font-size: 23px;
+        margin-top: 1px;
+      }
+    }
+  }
 }
 
 .show {

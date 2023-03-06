@@ -86,7 +86,7 @@ const Game: React.FC<{ disabled: boolean }> = ({ disabled }) => {
     <div className={styles.container}>
       <MenuBar>
         <PuzzleImgOptionsModal currentImage={imageSrc} changeImage={changeImage} />
-        <LevelOptionsDropdown />
+        <LevelOptionsDropdown activeLevel={tilesPerSide} />
       </MenuBar>
       <div className={styles.grid}>
         <div className={styles.sketch}>

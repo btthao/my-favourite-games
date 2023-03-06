@@ -1,12 +1,18 @@
-import Dropdown from 'components/window/dropdown/Dropdown'
 import React from 'react'
+import Dropdown from 'components/window/dropdown/Dropdown'
+import DropdownItem from 'components/window/dropdown/DropdownItem'
+import { difficultyLevels } from 'utils/slidePuzzle'
 
-interface LevelOptionsDropdownProps {}
+interface LevelOptionsDropdownProps {
+  activeLevel: number
+}
 
-const LevelOptionsDropdown: React.FC<LevelOptionsDropdownProps> = ({}) => {
+const LevelOptionsDropdown: React.FC<LevelOptionsDropdownProps> = ({ activeLevel }) => {
   return (
     <Dropdown name="Levels">
-      <div>h</div>
+      {difficultyLevels.map((level) => (
+        <DropdownItem key={level} isActive={level == activeLevel} text={level + ' x ' + level} onSelect={() => console.log('h')} onDeselect={() => console.log('h')} />
+      ))}
     </Dropdown>
   )
 }
