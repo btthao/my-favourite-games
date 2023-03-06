@@ -1,0 +1,31 @@
+.wrapper {
+    position: relative;
+}
+
+.backdrop {
+  @include m.position-absolute;
+  background: rgba(100, 100, 100, 0.9);
+  visibility: hidden;
+  opacity: 0;
+  z-index: 1000;
+  color: v.$dark;
+  top: 30px;
+}
+
+
+.items {
+    background: black;
+    top: 25px;
+    position: absolute;
+    z-index: 3000;
+    min-width: 100px;
+    height: fit-content;
+    visibility: hidden;
+    opacity: 0;
+}
+
+.show {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
+}

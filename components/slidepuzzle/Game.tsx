@@ -6,6 +6,7 @@ import styles from 'styles/slidepuzzle/Game.module.scss'
 import { DIMENSION, TileState } from 'utils/slidePuzzle'
 import OptionsModal from './OptionsModal'
 import GameInfo from './GameInfo'
+import LevelOptionsDropdown from './LevelOptionsDropdown'
 
 const Game: React.FC<{ disabled: boolean }> = ({ disabled }) => {
   const { newGame, state, clickTile, initializeTiles, changeImage } = useGameState()
@@ -85,6 +86,7 @@ const Game: React.FC<{ disabled: boolean }> = ({ disabled }) => {
     <div className={styles.container}>
       <MenuBar>
         <OptionsModal currentImage={imageSrc} changeImage={changeImage} />
+        <LevelOptionsDropdown />
       </MenuBar>
       <div className={styles.grid}>
         <div className={styles.sketch}>
