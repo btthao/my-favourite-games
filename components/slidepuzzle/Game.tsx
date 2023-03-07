@@ -9,7 +9,7 @@ import GameInfo from './GameInfo'
 import LevelOptionsDropdown from './LevelOptionsDropdown'
 
 const Game: React.FC<{ disabled: boolean }> = ({ disabled }) => {
-  const { newGame, state, clickTile, initializeTiles, changeImage } = useGameState()
+  const { newGame, state, clickTile, initializeTiles, changeImage, changeLevel } = useGameState()
   const { imageSrc, tiles, tilesPerSide, tileSize, moveCounts, finished, showHint, isLoading } = state
 
   const setup = (p5: p5Types, canvasParentRef: Element) => {
@@ -86,7 +86,7 @@ const Game: React.FC<{ disabled: boolean }> = ({ disabled }) => {
     <div className={styles.container}>
       <MenuBar>
         <PuzzleImgOptionsModal currentImage={imageSrc} changeImage={changeImage} />
-        <LevelOptionsDropdown activeLevel={tilesPerSide} />
+        <LevelOptionsDropdown activeLevel={tilesPerSide} changeLevel={changeLevel} />
       </MenuBar>
       <div className={styles.grid}>
         <div className={styles.sketch}>

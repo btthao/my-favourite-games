@@ -8,6 +8,7 @@ const ACTION_TYPE_NEW_GAME = 'new-game'
 const ACTION_TYPE_INITIALIZE_TILES = 'initialize-tiles'
 const ACTION_TYPE_CLICK = 'move-tile'
 const ACTION_TYPE_CHANGE_IMAGE = 'change-image'
+const ACTION_TYPE_CHANGE_LEVEL = 'change-level'
 
 export interface GameState {
   imageSrc: string
@@ -37,6 +38,7 @@ interface Payload {
   tiles?: TileState[]
   tilePosition?: TilePosition
   imageSrc?: string
+  level?: number
 }
 
 function reduce(state: GameState, action: { payload?: Payload; type: string }): GameState {
@@ -55,7 +57,7 @@ function reduce(state: GameState, action: { payload?: Payload; type: string }): 
 
       const moves = [1, -1, tilesPerSide, tilesPerSide * -1]
 
-      for (let i = 0; i < state.tilesPerSide * 15; i++) {
+      for (let i = 0; i < state.tilesPerSide * 50; i++) {
         let newIdx = emptyTileIdx
 
         while (newIdx == prevEmptyTileIdx || newIdx == emptyTileIdx || !isValidMove(emptyTileIdx, newIdx, tilesPerSide)) {
@@ -112,6 +114,24 @@ function reduce(state: GameState, action: { payload?: Payload; type: string }): 
         emptyTileIdx: state.tilesPerSide * state.tilesPerSide - 1,
         moveCounts: 0,
         isLoading: true,
+        finished: false,
+      }
+    }
+
+    case ACTION_TYPE_CHANGE_LEVEL: {
+      if (!payload?.level || payload?.level == state.tilesPerSide) return state
+
+      const tilesPerSide = payload.level
+
+      return {
+        ...state,
+        tiles: [],
+        tilesPerSide,
+        emptyTileIdx: tilesPerSide * tilesPerSide - 1,
+        tileSize: DIMENSION / tilesPerSide,
+        moveCounts: 0,
+        isLoading: true,
+        finished: false,
       }
     }
 
@@ -153,7 +173,14 @@ const useGameState = () => {
     })
   }, [])
 
-  return { state, newGame, initializeTiles, clickTile, changeImage }
+  const changeLevel = useCallback((level: number) => {
+    dispatch({
+      type: ACTION_TYPE_CHANGE_LEVEL,
+      payload: { level },
+    })
+  }, [])
+
+  return { state, newGame, initializeTiles, clickTile, changeImage, changeLevel }
 }
 
 export default useGameState

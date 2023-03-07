@@ -5,13 +5,14 @@ import { difficultyLevels } from 'utils/slidePuzzle'
 
 interface LevelOptionsDropdownProps {
   activeLevel: number
+  changeLevel: (level: number) => void
 }
 
-const LevelOptionsDropdown: React.FC<LevelOptionsDropdownProps> = ({ activeLevel }) => {
+const LevelOptionsDropdown: React.FC<LevelOptionsDropdownProps> = ({ activeLevel, changeLevel }) => {
   return (
     <Dropdown name="Levels">
       {difficultyLevels.map((level) => (
-        <DropdownItem key={level} isActive={level == activeLevel} text={level + ' x ' + level} onSelect={() => console.log('h')} onDeselect={() => console.log('h')} />
+        <DropdownItem key={level} isActive={level == activeLevel} text={level + ' x ' + level} onClick={() => changeLevel(level)} />
       ))}
     </Dropdown>
   )

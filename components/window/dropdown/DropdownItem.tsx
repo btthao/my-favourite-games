@@ -2,14 +2,13 @@ import React from 'react'
 import { BsCheck } from 'react-icons/bs'
 export interface DropdownItemProps {
   text: string | number
-  onSelect: () => void
-  onDeselect: () => void
+  onClick: () => void
   isActive?: boolean
 }
 
-const DropdownItem: React.FC<DropdownItemProps> = ({ onDeselect, onSelect, text, isActive }) => {
+const DropdownItem: React.FC<DropdownItemProps> = ({ onClick, text, isActive }) => {
   return (
-    <div>
+    <div onClick={onClick}>
       {isActive !== undefined && <span>{isActive && <BsCheck />}</span>}
       <span>{text}</span>
     </div>
