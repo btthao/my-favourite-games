@@ -9,6 +9,7 @@ const ACTION_TYPE_INITIALIZE_TILES = 'initialize-tiles'
 const ACTION_TYPE_CLICK = 'move-tile'
 const ACTION_TYPE_CHANGE_IMAGE = 'change-image'
 const ACTION_TYPE_CHANGE_LEVEL = 'change-level'
+const ACTION_TYPE_TOGGLE_SHOW_HINT = 'toggle-show-hint'
 
 export interface GameState {
   imageSrc: string
@@ -30,7 +31,7 @@ export const DEFAULT_GAME_STATE: GameState = {
   tileSize: DIMENSION / DEFAULT_LEVEL,
   moveCounts: 0,
   finished: false,
-  showHint: false,
+  showHint: true,
   isLoading: true,
 }
 
@@ -135,6 +136,13 @@ function reduce(state: GameState, action: { payload?: Payload; type: string }): 
       }
     }
 
+    case ACTION_TYPE_TOGGLE_SHOW_HINT: {
+      return {
+        ...state,
+        showHint: !state.showHint,
+      }
+    }
+
     case ACTION_TYPE_NEW_GAME: {
       return DEFAULT_GAME_STATE
     }
@@ -180,7 +188,13 @@ const useGameState = () => {
     })
   }, [])
 
-  return { state, newGame, initializeTiles, clickTile, changeImage, changeLevel }
+  const toggleShowHint = useCallback(() => {
+    dispatch({
+      type: ACTION_TYPE_TOGGLE_SHOW_HINT,
+    })
+  }, [])
+
+  return { state, newGame, initializeTiles, clickTile, changeImage, changeLevel, toggleShowHint }
 }
 
 export default useGameState

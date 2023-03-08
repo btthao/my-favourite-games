@@ -7,9 +7,10 @@ import { DIMENSION, TileState } from 'utils/slidePuzzle'
 import PuzzleImgOptionsModal from './PuzzleImgOptionsModal'
 import GameInfo from './GameInfo'
 import LevelOptionsDropdown from './LevelOptionsDropdown'
+import ShowHintDropdown from './ShowHintDropdown'
 
 const Game: React.FC<{ disabled: boolean }> = ({ disabled }) => {
-  const { newGame, state, clickTile, initializeTiles, changeImage, changeLevel } = useGameState()
+  const { newGame, state, clickTile, initializeTiles, changeImage, changeLevel, toggleShowHint } = useGameState()
   const { imageSrc, tiles, tilesPerSide, tileSize, moveCounts, finished, showHint, isLoading } = state
 
   const setup = (p5: p5Types, canvasParentRef: Element) => {
@@ -54,7 +55,7 @@ const Game: React.FC<{ disabled: boolean }> = ({ disabled }) => {
       p5.image(img, canvasPosition.x, canvasPosition.y, tileSize, tileSize)
 
       if (showHint) {
-        p5.textSize(tileSize / 7)
+        p5.textSize(Math.max(tileSize / 7, 13))
         p5.text(correctIdx + 1, canvasPosition.x + tileSize / 15, canvasPosition.y + tileSize * 0.93)
         p5.fill(255)
       }
@@ -87,6 +88,7 @@ const Game: React.FC<{ disabled: boolean }> = ({ disabled }) => {
       <MenuBar>
         <PuzzleImgOptionsModal currentImage={imageSrc} changeImage={changeImage} />
         <LevelOptionsDropdown activeLevel={tilesPerSide} changeLevel={changeLevel} />
+        <ShowHintDropdown isShowingHint={showHint} toggleShowHint={toggleShowHint} />
       </MenuBar>
       <div className={styles.grid}>
         <div className={styles.sketch}>
