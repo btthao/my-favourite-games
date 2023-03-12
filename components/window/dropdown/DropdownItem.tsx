@@ -6,10 +6,10 @@ export interface DropdownItemProps {
   isActive?: boolean
 }
 
-const DropdownItem: React.FC<DropdownItemProps> = ({ onClick, text, isActive }) => {
+const DropdownItem: React.FC<DropdownItemProps> = ({ onClick, text, isActive = false }) => {
   return (
     <div onClick={onClick}>
-      {isActive !== undefined && <span>{isActive && <BsCheck />}</span>}
+      <span>{isActive && <BsCheck />}</span>
       <span>{text}</span>
     </div>
   )

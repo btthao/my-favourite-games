@@ -7,12 +7,12 @@ import { DIMENSION, TileState } from 'utils/slidePuzzle'
 import PuzzleImgOptionsModal from './PuzzleImgOptionsModal'
 import GameInfo from './GameInfo'
 import LevelOptionsDropdown from './LevelOptionsDropdown'
-import ShowHintDropdown from './ShowHintDropdown'
+import HelpDropdown from './HelpDropdown'
 import Confetti from 'components/miscellaneous/Confetti'
 
 const Game: React.FC<{ disabled: boolean }> = ({ disabled }) => {
   const { newGame, state, clickTile, initializeTiles, changeImage, changeLevel, toggleShowHint } = useGameState()
-  const { imageSrc, tiles, tilesPerSide, tileSize, moveCounts, finished, showHint, isLoading } = state
+  const { imageSrc, tiles, tilesPerSide, tileSize, moveCounts, finished, showHint, isLoading, gameCount } = state
 
   const setup = (p5: p5Types, canvasParentRef: Element) => {
     p5.createCanvas(DIMENSION, DIMENSION).parent(canvasParentRef)
@@ -89,15 +89,15 @@ const Game: React.FC<{ disabled: boolean }> = ({ disabled }) => {
       <MenuBar>
         <PuzzleImgOptionsModal currentImage={imageSrc} changeImage={changeImage} />
         <LevelOptionsDropdown activeLevel={tilesPerSide} changeLevel={changeLevel} />
-        <ShowHintDropdown isShowingHint={showHint} toggleShowHint={toggleShowHint} />
+        <HelpDropdown restart={newGame} isShowingHint={showHint} toggleShowHint={toggleShowHint} />
       </MenuBar>
       <div className={styles.grid}>
         <div className={styles.sketch}>
           {/* @ts-ignore */}
-          <Sketch key={imageSrc + tilesPerSide} setup={setup} draw={draw} mouseClicked={mouseClicked} />
+          <Sketch key={imageSrc + tilesPerSide + gameCount } setup={setup} draw={draw} mouseClicked={mouseClicked} />
           {isLoading && <div className={styles.loading}>Slicing images...</div>}
         </div>
-        <GameInfo key={imageSrc + tilesPerSide} imageSrc={imageSrc} moveCounts={moveCounts} finished={finished} />
+        <GameInfo key={imageSrc + tilesPerSide + gameCount} imageSrc={imageSrc} moveCounts={moveCounts} finished={finished} />
       </div>
       {finished && <Confetti />}
     </div>

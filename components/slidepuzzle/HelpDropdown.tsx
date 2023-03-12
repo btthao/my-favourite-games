@@ -2,17 +2,19 @@ import React from 'react'
 import Dropdown from 'components/window/dropdown/Dropdown'
 import DropdownItem from 'components/window/dropdown/DropdownItem'
 
-interface LevelOptionsDropdownProps {
+interface HelpDropdownProps {
   isShowingHint: boolean
+  restart: () => void
   toggleShowHint: () => void
 }
 
-const ShowHintDropdown: React.FC<LevelOptionsDropdownProps> = ({ isShowingHint, toggleShowHint }) => {
+const HelpDropdown: React.FC<HelpDropdownProps> = ({ isShowingHint, toggleShowHint, restart }) => {
   return (
     <Dropdown name="Help">
       <DropdownItem isActive={isShowingHint} text="Show Hint" onClick={toggleShowHint} />
+      <DropdownItem text="Restart" onClick={restart} />
     </Dropdown>
   )
 }
 
-export default ShowHintDropdown
+export default HelpDropdown
