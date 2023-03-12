@@ -4,9 +4,9 @@ import Image from 'next/image'
 import styles from 'styles/slidepuzzle/GameInfo.module.scss'
 import Timer from 'components/miscellaneous/Timer'
 
-type GameInfoProps = Required<Pick<GameState, 'imageSrc' | 'moveCounts'>>
+type GameInfoProps = Required<Pick<GameState, 'imageSrc' | 'moveCounts' | 'finished'>>
 
-const GameInfo: React.FC<GameInfoProps> = ({ imageSrc, moveCounts }) => {
+const GameInfo: React.FC<GameInfoProps> = ({ imageSrc, moveCounts, finished }) => {
   return (
     <div className={styles.container}>
       <div className={styles.stats}>
@@ -17,7 +17,7 @@ const GameInfo: React.FC<GameInfoProps> = ({ imageSrc, moveCounts }) => {
         <div>
           <h6>Timer: </h6>
           <p>
-            <Timer />
+            <Timer stop={finished} />
           </p>
         </div>
       </div>

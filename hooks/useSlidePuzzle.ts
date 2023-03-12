@@ -1,6 +1,6 @@
 import { DEFAULT_IMAGE, DEFAULT_LEVEL, DIMENSION, updateCanvasPosition } from './../utils/slidePuzzle'
 import { selectRandomFromList, swapInArray } from './../utils/helpers'
-import { useCallback, useReducer } from 'react'
+import { useCallback, useEffect, useReducer } from 'react'
 import { TilePosition } from 'utils/tile'
 import { isValidMove, TileState } from 'utils/slidePuzzle'
 
@@ -10,6 +10,7 @@ const ACTION_TYPE_CLICK = 'move-tile'
 const ACTION_TYPE_CHANGE_IMAGE = 'change-image'
 const ACTION_TYPE_CHANGE_LEVEL = 'change-level'
 const ACTION_TYPE_TOGGLE_SHOW_HINT = 'toggle-show-hint'
+const ACTION_TYPE_CHECK_FINISH = 'check-finish'
 
 export interface GameState {
   imageSrc: string
@@ -143,6 +144,22 @@ function reduce(state: GameState, action: { payload?: Payload; type: string }): 
       }
     }
 
+    case ACTION_TYPE_CHECK_FINISH: {
+      let finished = true
+
+      for (let i = 0; i < state.tiles.length; i++) {
+        if (i !== state.tiles[i].correctIdx) {
+          finished = false
+          break
+        }
+      }
+
+      return {
+        ...state,
+        finished,
+      }
+    }
+
     case ACTION_TYPE_NEW_GAME: {
       return DEFAULT_GAME_STATE
     }
@@ -193,6 +210,17 @@ const useGameState = () => {
       type: ACTION_TYPE_TOGGLE_SHOW_HINT,
     })
   }, [])
+
+  const checkFinish = useCallback(() => {
+    dispatch({
+      type: ACTION_TYPE_CHECK_FINISH,
+    })
+  }, [])
+
+  useEffect(() => {
+    if (state.isLoading) return
+    checkFinish()
+  }, [state.tiles, state.isLoading, checkFinish])
 
   return { state, newGame, initializeTiles, clickTile, changeImage, changeLevel, toggleShowHint }
 }

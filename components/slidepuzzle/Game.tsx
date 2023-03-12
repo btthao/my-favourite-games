@@ -8,6 +8,7 @@ import PuzzleImgOptionsModal from './PuzzleImgOptionsModal'
 import GameInfo from './GameInfo'
 import LevelOptionsDropdown from './LevelOptionsDropdown'
 import ShowHintDropdown from './ShowHintDropdown'
+import Confetti from 'components/miscellaneous/Confetti'
 
 const Game: React.FC<{ disabled: boolean }> = ({ disabled }) => {
   const { newGame, state, clickTile, initializeTiles, changeImage, changeLevel, toggleShowHint } = useGameState()
@@ -69,7 +70,7 @@ const Game: React.FC<{ disabled: boolean }> = ({ disabled }) => {
   }
 
   const mouseClicked = (p5: p5Types) => {
-    if (disabled) return
+    if (disabled || finished) return
 
     const { mouseX, mouseY, floor } = p5
 
@@ -96,8 +97,9 @@ const Game: React.FC<{ disabled: boolean }> = ({ disabled }) => {
           <Sketch key={imageSrc + tilesPerSide} setup={setup} draw={draw} mouseClicked={mouseClicked} />
           {isLoading && <div className={styles.loading}>Slicing images...</div>}
         </div>
-        <GameInfo key={imageSrc + tilesPerSide} imageSrc={imageSrc} moveCounts={moveCounts} />
+        <GameInfo key={imageSrc + tilesPerSide} imageSrc={imageSrc} moveCounts={moveCounts} finished={finished} />
       </div>
+      {finished && <Confetti />}
     </div>
   )
 }
