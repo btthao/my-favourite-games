@@ -1,3 +1,4 @@
+import GameOverModal from 'components/miscellaneous/GameOverModal'
 import StatusBar from 'components/window/StatusBar'
 import useGameState, { DEFAULT_GAME_STATE, GameState } from 'hooks/useLines98State'
 import useLocalStorage from 'hooks/useLocalStorage'
@@ -83,7 +84,7 @@ const Game: React.FC<{ disabled: boolean }> = ({ disabled }) => {
         gameOver={gameOver}
         restart={restart}
         undo={undo}
-        disableUndo={!prevBalls.length}
+        disableUndo={!prevBalls.length || gameOver}
         leftComponent={
           <>
             <div>{score}</div>
@@ -100,6 +101,7 @@ const Game: React.FC<{ disabled: boolean }> = ({ disabled }) => {
       <div>
         {/* @ts-ignore */}
         <Sketch setup={setup} draw={draw} mouseClicked={mouseClicked} />
+        {gameOver && <GameOverModal restart={restart} />}
       </div>
     </div>
   )

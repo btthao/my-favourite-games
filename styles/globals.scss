@@ -27,6 +27,7 @@ button,
 [role='button'] {
   color: v.$dark;
   cursor: pointer;
+  border: none;
 }
 
 .page-wrapper {
@@ -71,5 +72,17 @@ button,
   }
   #folder-front {
     fill: #4f87b8;
+  }
+}
+
+button.game-over {
+  background: v.$blue;
+  color: v.$white;
+  padding: 10px 30px;
+  border-radius: 0.4rem;
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+  &:hover {
+    filter: brightness(1.1);
   }
 }

@@ -5,6 +5,7 @@ import Tile from './Tile'
 import useLocalStorage from 'hooks/useLocalStorage'
 import StatusBar from 'components/window/StatusBar'
 import { GRID_SIZE, TILE_SIZE } from 'utils/2048'
+import GameOverModal from 'components/miscellaneous/GameOverModal'
 
 const Game: React.FC<{ disabled: boolean }> = ({ disabled }) => {
   const [localStorage, setLocalStorage] = useLocalStorage<GameState>('2048', DEFAULT_GAME_STATE)
@@ -81,6 +82,7 @@ const Game: React.FC<{ disabled: boolean }> = ({ disabled }) => {
           </div>
         </div>
       </div>
+      {gameOver && <GameOverModal restart={newGame} />}
     </div>
   )
 }
