@@ -7,7 +7,7 @@ import Tile from './Tile'
 
 const Game: React.FC = () => {
   const { state, newGame, reveal, flag } = useGameState()
-  const { tiles, gameOver, minesCount, won, isInitialized } = state
+  const { tiles, gameOver, minesCount, won, gameCount } = state
 
   return (
     <div className={styles.container}>
@@ -25,7 +25,7 @@ const Game: React.FC = () => {
         rightComponent={
           <>
             <div>
-              <Timer key={isInitialized.toString()} stop={gameOver || !isInitialized} />
+              <Timer key={gameCount} stop={gameOver} />
             </div>
             <div>Timer</div>
           </>

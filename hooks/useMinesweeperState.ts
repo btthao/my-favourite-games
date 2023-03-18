@@ -12,6 +12,7 @@ export interface GameState {
   gameOver: boolean
   isInitialized: boolean
   won: boolean
+  gameCount: number
 }
 
 export const DEFAULT_GAME_STATE: GameState = {
@@ -20,6 +21,7 @@ export const DEFAULT_GAME_STATE: GameState = {
   gameOver: false,
   isInitialized: false,
   won: false,
+  gameCount: 0,
 }
 
 function reduce(state: GameState, action: { payload?: { tileIndex: number }; type: string }): GameState {
@@ -90,7 +92,7 @@ function reduce(state: GameState, action: { payload?: { tileIndex: number }; typ
     }
 
     case ACTION_TYPE_NEW_GAME: {
-      return DEFAULT_GAME_STATE
+      return { ...DEFAULT_GAME_STATE, gameCount: state.gameCount + 1 }
     }
 
     default: {
