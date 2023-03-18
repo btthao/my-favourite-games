@@ -35,8 +35,12 @@ export const DEFAULT_GAME_STATE: GameState = {
   finished: false,
   showHint: true,
   isLoading: true,
-  gameCount: 0
+  gameCount: 0,
 }
+
+export type GameSettings = Required<Pick<GameState, 'imageSrc' | 'tilesPerSide' | 'showHint'>>
+const { imageSrc, tilesPerSide, showHint } = DEFAULT_GAME_STATE
+export const GAME_SETTINGS: GameSettings = { imageSrc, tilesPerSide, showHint }
 
 interface Payload {
   tiles?: TileState[]
@@ -170,7 +174,7 @@ function reduce(state: GameState, action: { payload?: Payload; type: string }): 
         moveCounts: 0,
         isLoading: true,
         finished: false,
-        gameCount: state.gameCount + 1
+        gameCount: state.gameCount + 1,
       }
     }
 
@@ -180,8 +184,19 @@ function reduce(state: GameState, action: { payload?: Payload; type: string }): 
   }
 }
 
-const useGameState = () => {
-  const [state, dispatch] = useReducer(reduce, DEFAULT_GAME_STATE)
+const useGameState = (initialState: GameSettings) => {
+  const [state, dispatch] = useReducer(reduce, null, () => {
+    const { imageSrc, showHint, tilesPerSide } = initialState
+
+    return {
+      ...DEFAULT_GAME_STATE,
+      imageSrc,
+      tilesPerSide,
+      emptyTileIdx: tilesPerSide * tilesPerSide - 1,
+      tileSize: DIMENSION / tilesPerSide,
+      showHint,
+    }
+  })
 
   const newGame = useCallback(() => {
     dispatch({ type: ACTION_TYPE_NEW_GAME })

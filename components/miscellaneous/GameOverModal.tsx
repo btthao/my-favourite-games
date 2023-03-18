@@ -3,14 +3,16 @@ import Modal from 'components/window/modal/Modal'
 
 interface GameOverModalProps {
   restart: () => void
+  won?: boolean
 }
 
-const GameOverModal: React.FC<GameOverModalProps> = ({ restart }) => {
+const GameOverModal: React.FC<GameOverModalProps> = ({ restart, won = false }) => {
+  const text = won ? 'Yass' : "That' sad :("
   return (
     <Modal showOnRender={true} timeOut={1000}>
-      <p>That&apos;s sad :(</p>
+      <p>{text}</p>
       <button className="game-over" onClick={restart}>
-        Restart
+        New game
       </button>
     </Modal>
   )

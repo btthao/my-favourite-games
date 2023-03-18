@@ -1,5 +1,5 @@
 import MenuBar from 'components/window/MenuBar'
-import useGameState from 'hooks/useSlidePuzzle'
+import useGameState, { GameSettings, GAME_SETTINGS } from 'hooks/useSlidePuzzle'
 import p5Types from 'p5'
 import Sketch from 'react-p5'
 import styles from 'styles/slidepuzzle/Game.module.scss'
@@ -9,9 +9,13 @@ import GameInfo from './GameInfo'
 import LevelOptionsDropdown from './LevelOptionsDropdown'
 import HelpDropdown from './HelpDropdown'
 import Confetti from 'components/miscellaneous/Confetti'
+import GameOverModal from 'components/miscellaneous/GameOverModal'
+import useLocalStorage from 'hooks/useLocalStorage'
+import { useEffect } from 'react'
 
 const Game: React.FC<{ disabled: boolean }> = ({ disabled }) => {
-  const { newGame, state, clickTile, initializeTiles, changeImage, changeLevel, toggleShowHint } = useGameState()
+  const [localStorage, setLocalStorage] = useLocalStorage<GameSettings>('slidepuzzle', GAME_SETTINGS)
+  const { newGame, state, clickTile, initializeTiles, changeImage, changeLevel, toggleShowHint } = useGameState(localStorage)
   const { imageSrc, tiles, tilesPerSide, tileSize, moveCounts, finished, showHint, isLoading, gameCount } = state
 
   const setup = (p5: p5Types, canvasParentRef: Element) => {
@@ -84,6 +88,10 @@ const Game: React.FC<{ disabled: boolean }> = ({ disabled }) => {
     clickTile({ r, c })
   }
 
+  useEffect(() => {
+    setLocalStorage({ imageSrc, showHint, tilesPerSide })
+  }, [imageSrc, tilesPerSide, showHint])
+
   return (
     <div className={styles.container}>
       <MenuBar>
@@ -94,12 +102,13 @@ const Game: React.FC<{ disabled: boolean }> = ({ disabled }) => {
       <div className={styles.grid}>
         <div className={styles.sketch}>
           {/* @ts-ignore */}
-          <Sketch key={imageSrc + tilesPerSide + gameCount } setup={setup} draw={draw} mouseClicked={mouseClicked} />
+          <Sketch key={imageSrc + tilesPerSide + gameCount} setup={setup} draw={draw} mouseClicked={mouseClicked} />
           {isLoading && <div className={styles.loading}>Slicing images...</div>}
         </div>
         <GameInfo key={imageSrc + tilesPerSide + gameCount} imageSrc={imageSrc} moveCounts={moveCounts} finished={finished} />
       </div>
       {finished && <Confetti />}
+      {finished && <GameOverModal won={true} restart={newGame} />}
     </div>
   )
 }
