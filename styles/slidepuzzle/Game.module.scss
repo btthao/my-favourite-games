@@ -21,7 +21,7 @@
 
 .loading {
   @include m.position-absolute;
-  background: #8094bf;
+  background: v.$silver;
   display: grid;
   place-items: center;
   font-size: 1.8rem;

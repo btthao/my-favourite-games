@@ -8,20 +8,20 @@ export interface TileState {
 
 export const imageOptions = [
   {
-    name: 'red',
-    src: '/taylor/red.jpeg',
+    name: 'books',
+    src: '/puzzles/books.png',
   },
   {
-    name: 'lover',
-    src: '/taylor/lover.jpeg',
+    name: 'earth',
+    src: '/puzzles/earth.png',
   },
   {
-    name: 'folklore',
-    src: '/taylor/folklore.jpeg',
+    name: 'stationery',
+    src: '/puzzles/stationery.png',
   },
   {
-    name: 'antihero',
-    src: '/taylor/antihero.jpeg',
+    name: 'tea',
+    src: '/puzzles/tea.png',
   },
 ]
 

@@ -44,12 +44,12 @@ const Game: React.FC<{ disabled: boolean }> = ({ disabled }) => {
       initializeTiles(tilesCutFromImage)
     })
 
-    p5.stroke('#8094bf')
+    p5.stroke('#ebebeb')
     p5.strokeWeight(0.5)
   }
 
   const draw = (p5: p5Types) => {
-    p5.background('#8094bf')
+    p5.background('#ebebeb')
 
     // draw images
     for (let i = 0; i < tiles.length; i++) {
