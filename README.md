@@ -11,8 +11,17 @@ yarn dev
 ## List of games
 
 - Lines98 (with A\* pathfinding algorithm)
-  ![Alt Text](public/lines98.gif)
+
+  <img src="public/lines98.gif" width="160" />
 
 - 2048
+
+  <img src="public/2048.gif" width="160" />
+
 - Minesweeper
+
+  <img src="public/minesweeper.gif" width="160" />
+
 - Slide puzzle
+
+  <img src="public/slidepuzzle.gif" width="160" />
